@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="fr-CA">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bourses de la Relève Sportive - Aréna Régional Lareau</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --page-bg: rgb(29, 29, 27);
+            --content-bg: white;
+            --text-color: rgb(29, 29, 27);
+            --accent-color: rgb(241, 94, 104);
+            --border-color: #dee2e6;
+            --input-bg: #f8f9fa;
+            --glow-color: rgba(241, 94, 104, 0.5);
+        }
+
+        body {
+            background-color: var(--page-bg);
+            color: var(--text-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .main-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 1600px;
+            margin: 20px auto;
+        }
+
+        .content-section {
+            background-color: var(--content-bg);
+            border-radius: 45px;
+            box-shadow: 0 0 15px 5px var(--glow-color);
+            overflow: hidden;
+            margin-bottom: 20px;
+            width: 80%;
+        }
+
+        .intro-section {
+             margin: 0;
+             display: flex;
+             flex-direction: column;
+             justify-content: space-between;
+        }
+
+        .survey-section {
+             margin: 0;
+        }
+
+        .sports-icons {
+             display: flex;
+             flex-wrap: wrap;
+             justify-content: center;
+             align-items: center;
+             padding: 20px;
+             gap: 15px;
+             margin-top: auto; /* Push icons to bottom */
+             flex-grow: 1; /* Allow icon container to take space */
+        }
+         .sports-icons i {
+             font-size: 2.8em;
+             color: var(--accent-color);
+             opacity: 0.7;
+         }
+
+        @media (min-width: 1024px) {
+            body {
+                padding: 40px 7%;
+            }
+            .main-container {
+                 flex-direction: row;
+                 justify-content: space-between;
+                 align-items: stretch;
+                 gap: 6%;
+                 margin: 0;
+                 max-width: none;
+            }
+            .intro-section {
+                width: 47%;
+                margin-bottom: 0;
+            }
+            .survey-section {
+                width: 47%;
+                margin-bottom: 0;
+            }
+            .intro-content {
+                 flex-grow: 1;
+             }
+            .sports-icons {
+                  padding: 30px 10px;
+                  flex-wrap: wrap;
+                  justify-content: space-around;
+                  align-items: center;
+            }
+            .sports-icons i {
+                 font-size: 10vw;
+                 transition: all 0.3s ease;
+                 line-height: 1;
+                 margin: 25px;
+                 padding: 15px;
+                 width: auto;
+                 text-align: center;
+             }
+             .sports-icons i:hover {
+                 opacity: 1;
+                 transform: scale(1.1);
+             }
+        }
+
+        .section-header img {
+            width: 100%;
+            height: auto;
+            display: block;
+            object-fit: cover;
+        }
+
+        .section-content {
+            padding: 20px 30px 30px 30px;
+        }
+
+        .intro-title {
+             font-family: 'Black Ops One', sans-serif;
+             color: var(--accent-color);
+             font-size: 2.8em;
+             text-align: center;
+             margin-bottom: 25px;
+             font-weight: 400;
+             letter-spacing: 1px;
+        }
+
+
+        .intro-content p, .intro-content li {
+             font-size: 1.1rem;
+        }
+
+        .survey-section .section-content h2 {
+            font-family: 'Black Ops One', sans-serif;
+            color: var(--accent-color);
+            font-weight: 400;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            letter-spacing: 0.5px;
+        }
+        .section-content h3 {
+             font-weight: bold;
+             margin-top: 1.5em;
+             margin-bottom: 0.5em;
+             font-size: 1.2rem;
+        }
+
+        .section-content p, .section-content li {
+            margin-bottom: 1em;
+            line-height: 1.6;
+        }
+         .section-content ol {
+             list-style-type: decimal;
+             list-style-position: inside;
+             padding-left: 5px;
+         }
+        .section-content ol li {
+             margin-bottom: 0.8em;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid var(--border-color);
+            margin: 30px 0;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+         .form-group label.question-title {
+             font-family: 'Black Ops One', sans-serif;
+             font-size: 1.4em;
+             color: var(--accent-color);
+             text-decoration: underline;
+             margin-top: 30px;
+             margin-bottom: 10px;
+             font-weight: 400;
+             letter-spacing: 0.5px;
+         }
+         .form-group label.question-description {
+              font-weight: normal;
+              font-style: italic;
+              font-size: 0.9rem;
+              color: #555;
+              margin-bottom: 15px;
+         }
+
+        .form-group input[type="text"],
+        .form-group input[type="tel"],
+        .form-group input[type="date"],
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 1rem;
+            background-color: var(--input-bg);
+            transition: all 0.2s ease-in-out;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 2px rgba(241, 94, 104, 0.2);
+            background-color: white;
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+         .char-counter {
+            text-align: right;
+            font-size: 0.8em;
+            color: #777;
+            margin-top: 3px;
+         }
+         .char-counter.limit-near { color: orange; }
+         .char-counter.limit-exceeded { color: red; font-weight: bold; }
+
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 2vw;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            text-align: center;
+        }
+
+        .btn-download, .btn-send {
+            background-color: var(--page-bg);
+            color: var(--accent-color);
+            border: 2px solid var(--accent-color);
+        }
+
+        .btn-download:hover, .btn-send:hover {
+            background-color: var(--accent-color);
+            color: var(--page-bg);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+         .btn-download:active, .btn-send:active {
+            transform: scale(0.98) translateY(0px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+         }
+
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: #ccc;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+         @media (max-width: 640px) {
+              body {
+                   padding: 10px;
+              }
+              .main-container {
+                   margin: 10px auto;
+              }
+             .content-section {
+                 margin: 0 5%;
+                 width: 90%;
+             }
+             .section-content {
+                 padding: 15px 20px 20px 20px;
+             }
+             .intro-title {
+                  font-size: 2em;
+             }
+             .intro-content p, .intro-content li {
+                  font-size: 1rem;
+             }
+              .survey-section .section-content h2 {
+                   font-size: 1.5em;
+              }
+              .form-group label.question-title {
+                   font-size: 1.3em;
+              }
+             .button-group {
+                  flex-direction: column;
+             }
+              .sports-icons i {
+                  font-size: 2.5em;
+              }
+
+         }
+
+         body { animation: bodyFadeIn 0.5s ease-out; }
+         @keyframes bodyFadeIn {
+             from { opacity: 0; }
+             to { opacity: 1; }
+         }
+    </style>
+</head>
+<body>
+
+    <div class="main-container">
+        <section class="content-section intro-section">
+            <header class="section-header">
+                <img src="./images/header_intro.png" alt="Bourses de la Relève Sportive - Header Introduction"
+                     onerror="this.style.backgroundColor='var(--gray)'; this.alt='Erreur image header intro';">
+            </header>
+            <div class="section-content intro-content">
+                 <h1 class="intro-title">CONCOURS JEUNESSE</h1>
+                <p>Afin de soutenir la relève de la MRC des Jardins-de-Napierville, l'aréna régional Lareau de concert avec Desjardins remettra huit bourses de quatre cents dollars chacune ainsi que quatre bourses de deux cents dollars chacune en soutien à la relève sportive à de jeunes sportifs et athlètes des municipalités participantes au financement de l'aréna régional Lareau, soit Napierville, Saint-Cyprien-de-Napierville, Hemmingford (canton), Saint-Bernard-de-Lacolle, Saint-Paul-de-l'île-aux-Noix, Saint-Blaise-sur-Richelieu, Saint-Jacques-le-Mineur et Saint-Valentin.</p>
+                <p>Cette initiative est rendue possible grâce à la participation de Desjardins et de fonds amassés lors de la soirée-bénéfice (gala de lutte qui eut lieu le 7 juin dernier à Napierville); une autre partie des fonds amassés durant cette soirée servira aussi à assurer le partenariat de l'aréna régionale Lareau.</p>
+                <hr>
+                <h3>Critères de sélection :</h3>
+                <p>Les bourses de soutien de la relève sportive sont destinées à :</p>
+                <ol>
+                    <li>Des athlètes qui pratiquent n'importe quel sport;</li>
+                    <li>Âgé(e)s entre huit et dix-sept ans;</li>
+                    <li>Ayant comme résidence soit Napierville, Saint-Cyprien-de-Napierville, Hemmingford (canton), Saint-Bernard-de-Lacolle, Saint-Paul-de-l'île-aux-Noix, Saint-Blaise-sur-Richelieu, Saint-Jacques-le-Mineur ou Saint-Valentin. Une bourse sera accordée à un athlète résident dans une des municipalités participantes au financement de l'aréna régionale Lareau.</li>
+                    <li>L'aréna régionale Lareau tentera de remettre une bourse par sport représenté et tentera également de remettre une bourse par jeune par municipalité participante à son financement. En cas d'impossibilité due à des absences dans les candidatures proposées, l'aréna régionale Lareau se réserve le droit de donner une bourse à des athlètes exerçant un sport et provenant d'une des municipalités déjà représentées. De plus, quatre bourses de deux cents dollars seront accordées aux athlètes ayant soumis leur candidature via ce questionnaire - sondage.</li>
+                </ol>
+                 <p style="margin-top: 2em; font-style: italic;">Ce sera peut-être à vous la chance, qui sait?</p>
+            </div>
+             <div class="sports-icons">
+                 <i class="fas fa-hockey-puck" title="Hockey"></i>
+                 <i class="fa-solid fa-football" title="Football"></i>
+                 <i class="fas fa-person-skating" title="Patinage Artistique"></i>
+                 <i class="fa-solid fa-broom-ball" title="Broomball"></i>
+                 <i class="fas fa-basketball-ball" title="Basketball"></i>
+                 <i class="fas fa-person-swimming" title="Natation"></i>
+                 <i class="fas fa-volleyball-ball" title="Volleyball"></i>
+                 <i class="fas fa-baseball-bat-ball" title="Baseball"></i>
+                 <i class="fa-solid fa-stopwatch-20" title="Running"></i>
+                 <i class="fa-solid fa-medal" title="Winning"></i>
+             </div>
+        </section>
+
+        <section class="content-section survey-section">
+            <header class="section-header">
+                <img src="./images/header_survey.png" alt="Bourses de la Relève Sportive - Header Sondage"
+                     onerror="this.style.backgroundColor='var(--gray)'; this.alt='Erreur image header sondage';">
+            </header>
+            <div class="section-content">
+                <form id="bourseSurveyForm">
+                    <h2>Informations du Candidat</h2>
+                    <div class="form-group">
+                        <label for="candidatNom">Nom du ou de la candidate :</label>
+                        <input type="text" id="candidatNom" name="candidatNom" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="candidatVille">Ville :</label>
+                        <input type="text" id="candidatVille" name="candidatVille" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="candidatTel">Téléphone :</label>
+                        <input type="tel" id="candidatTel" name="candidatTel" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="candidatDob">Date de naissance :</label>
+                        <input type="date" id="candidatDob" name="candidatDob" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="candidatSport">Sport pratiqué :</label>
+                        <input type="text" id="candidatSport" name="candidatSport" required>
+                    </div>
+
+                    <hr>
+
+                    <h2>Informations du Parent Responsable</h2>
+                    <div class="form-group">
+                        <label for="parentNom">Nom du parent responsable :</label>
+                        <input type="text" id="parentNom" name="parentNom" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="parentVille">Ville :</label>
+                        <input type="text" id="parentVille" name="parentVille" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="parentTel">Téléphone :</label>
+                        <input type="tel" id="parentTel" name="parentTel" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="parentLien">Lien avec le ou la candidate :</label>
+                        <input type="text" id="parentLien" name="parentLien" required>
+                    </div>
+
+                    <hr>
+
+                    <h2>Questions au Candidat</h2>
+
+                    <div class="form-group">
+                        <label for="qSport" class="question-title">DESCRIPTION DE VOTRE SPORT</label>
+                        <label for="qSport" class="question-description">Parlez-nous de votre sport. Par exemple, faites-vous partie d'une équipe, d'une troupe ou d'un club? Participez-vous à des compétitions, à des concours ou à des spectacles? Combien de temps y consacrez-vous en moyenne? Combien d'heures cela représente-t-il dans votre horaire hebdomadaire?</label>
+                        <textarea id="qSport" name="qSport" minlength="100" maxlength="500" required></textarea>
+                        <div class="char-counter"><span id="qSportCount">0</span> / 500</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="qAmbitions" class="question-title">VOS AMBITIONS ET OBJECTIFS</label>
+                        <label for="qAmbitions" class="question-description">Parlez-nous de vos rêves, de vos ambitions, de vos projets, à court ou à long terme. Avez-vous des plans pour les prochaines années? Quels sont vos objectifs principaux ou secondaire par rapport au sport que vous pratiquez?</label>
+                        <textarea id="qAmbitions" name="qAmbitions" minlength="100" maxlength="500" required></textarea>
+                        <div class="char-counter"><span id="qAmbitionsCount">0</span> / 500</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="qFierte" class="question-title">FIERTÉ ET RÉSULTATS</label>
+                        <label for="qFierte" class="question-description">Qu'est-ce qui vous procure de la fierté dans votre parcours sportif? Partagez-nous vos résultats importants au cours de votre parcours ou bien au cours de la dernière année.</label>
+                        <textarea id="qFierte" name="qFierte" minlength="100" maxlength="500" required></textarea>
+                        <div class="char-counter"><span id="qFierteCount">0</span> / 500</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="qBesoins" class="question-title">VOS BESOINS</label>
+                        <label for="qBesoins" class="question-description">Pourquoi cette bourse vous aiderait-elle dans la poursuite de la pratique sportive que vous exercez? Partagez-nous les dépenses et les sacrifices reliés à la pratique de votre sport. Qu'est-ce que cela représente par rapport à l'ensemble de votre parcours ou bien par rapport à une année?</label>
+                        <textarea id="qBesoins" name="qBesoins" minlength="100" maxlength="500" required></textarea>
+                        <div class="char-counter"><span id="qBesoinsCount">0</span> / 500</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="qAutres" class="question-title" style="text-decoration: none;">AUTRES COMMENTAIRES <span style="font-weight:normal; font-style:italic; font-size: 0.9em; color: #555;">(Facultatif)</span></label>
+                        <label for="qAutres" class="question-description">Partagez-nous tout autre commentaire pertinent en lien avec le sport que vous pratiquez ou bien les bénéfices que vous pourriez vous offrir si jamais vous étiez l'un des gagnants cette année.</label>
+                        <textarea id="qAutres" name="qAutres" maxlength="500"></textarea>
+                        <div class="char-counter"><span id="qAutresCount">0</span> / 500</div>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="button" id="btnDownload" class="btn btn-download">
+                            <i class="fas fa-download"></i> Télécharger (TXT/CSV)
+                        </button>
+                        <button type="button" id="btnSend" class="btn btn-send">
+                            <i class="fas fa-paper-plane"></i> Envoyer
+                        </button>
+                    </div>
+                </form>
+                 <div id="feedbackMessage" class="mt-4 p-3 rounded text-center" style="display: none;"></div>
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        Date de l'inscription : 27 octobre au 21 novembre 2025<br>
+        Aréna régionale Lareau - 50 rue de l'Aqueduc, Napierville, Québec, J0J 1L0<br>
+        Courriel : glaplante@csrlc.ca
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('bourseSurveyForm');
+            const downloadBtn = document.getElementById('btnDownload');
+            const sendBtn = document.getElementById('btnSend');
+            const feedbackDiv = document.getElementById('feedbackMessage');
+
+            const textareas = [
+                { id: 'qSport', countId: 'qSportCount', min: 100, max: 500 },
+                { id: 'qAmbitions', countId: 'qAmbitionsCount', min: 100, max: 500 },
+                { id: 'qFierte', countId: 'qFierteCount', min: 100, max: 500 },
+                { id: 'qBesoins', countId: 'qBesoinsCount', min: 100, max: 500 },
+                { id: 'qAutres', countId: 'qAutresCount', min: 0, max: 500 }
+            ];
+
+            textareas.forEach(taInfo => {
+                const textarea = document.getElementById(taInfo.id);
+                const countSpan = document.getElementById(taInfo.countId);
+                const counterDiv = countSpan.parentElement;
+
+                textarea.addEventListener('input', () => {
+                    const count = textarea.value.length;
+                    countSpan.textContent = count;
+                    counterDiv.classList.remove('limit-near', 'limit-exceeded');
+                    textarea.style.borderColor = '';
+
+                    if (count > taInfo.max) {
+                        counterDiv.classList.add('limit-exceeded');
+                        textarea.style.borderColor = 'red';
+                    } else if (count > taInfo.max * 0.9) {
+                        counterDiv.classList.add('limit-near');
+                    }
+                     if (taInfo.min > 0 && count < taInfo.min && textarea.value.length > 0) {
+                         textarea.style.borderColor = 'orange';
+                     } else if (textarea.style.borderColor === 'orange') {
+                          textarea.style.borderColor = '';
+                     }
+                });
+                countSpan.textContent = textarea.value.length;
+            });
+
+            function validateForm(showFeedback = false) {
+                 feedbackDiv.style.display = 'none';
+                 feedbackDiv.textContent = '';
+                 feedbackDiv.className = 'mt-4 p-3 rounded text-center';
+
+                 let isValid = true;
+                 const requiredFields = form.querySelectorAll('[required]');
+                 let firstErrorField = null;
+
+                 requiredFields.forEach(field => {
+                     field.style.borderColor = '';
+                     const parentGroup = field.closest('.form-group');
+                     if (parentGroup) parentGroup.style.boxShadow = '0 3px 10px rgba(0, 0, 0, 0.05)';
+
+                     let fieldValid = true;
+                     if (!field.value.trim()) {
+                         fieldValid = false;
+                     } else if (field.tagName === 'TEXTAREA' && field.hasAttribute('minlength') && field.value.length < parseInt(field.getAttribute('minlength'))) {
+                         fieldValid = false;
+                     }
+
+
+                     if (!fieldValid) {
+                         isValid = false;
+                         if (showFeedback) {
+                             field.style.borderColor = 'var(--accent-color)';
+                             if(parentGroup) parentGroup.style.boxShadow = '0 0 0 2px rgba(241, 94, 104, 0.3)';
+                             if (!firstErrorField) firstErrorField = field;
+                         }
+                     }
+                 });
+
+                 if (!isValid && showFeedback) {
+                      displayFeedback('Veuillez remplir tous les champs obligatoires et respecter les longueurs minimales.', 'error');
+                      if (firstErrorField) {
+                          firstErrorField.focus();
+                           const fieldRect = firstErrorField.getBoundingClientRect();
+                           window.scrollTo({ top: window.pageYOffset + fieldRect.top - 100, behavior: 'smooth' });
+                      }
+                 }
+                 return isValid;
+            }
+
+
+             function getFormDataWithLabels() {
+                 const formData = new FormData(form);
+                 const data = {};
+                  const labels = {
+                      candidatNom: "Nom du candidat",
+                      candidatVille: "Ville du candidat",
+                      candidatTel: "Téléphone du candidat",
+                      candidatDob: "Date de naissance",
+                      candidatSport: "Sport pratiqué",
+                      parentNom: "Nom du parent",
+                      parentVille: "Ville du parent",
+                      parentTel: "Téléphone du parent",
+                      parentLien: "Lien avec candidat",
+                      qSport: "DESCRIPTION DE VOTRE SPORT",
+                      qAmbitions: "VOS AMBITIONS ET OBJECTIFS",
+                      qFierte: "FIERTÉ ET RÉSULTATS",
+                      qBesoins: "VOS BESOINS",
+                      qAutres: "AUTRES COMMENTAIRES"
+                  };
+
+                  for (const key of Object.keys(labels)) {
+                      const element = form.elements[key];
+                      if (element) {
+                           data[labels[key]] = element.value || '';
+                      }
+                  }
+
+                 return data;
+             }
+
+            function generateTimestamp() {
+                const now = new Date();
+                const dd = String(now.getDate()).padStart(2, '0');
+                const mm = String(now.getMonth() + 1).padStart(2, '0');
+                const yyyy = now.getFullYear();
+                const hh = String(now.getHours()).padStart(2, '0');
+                const min = String(now.getMinutes()).padStart(2, '0');
+                return `${dd}-${mm}-${yyyy}_${hh}h${min}`;
+            }
+
+            function formatAsText(data) {
+                let text = `Candidature - Bourses de la Relève Sportive - ${generateTimestamp()}\n`;
+                text += "==================================================\n\n";
+                for (const key in data) {
+                    text += `${key}:\n${data[key] || '-'}\n\n`;
+                }
+                return text;
+            }
+
+             function escapeCsvValue(value) {
+                 if (value === null || value === undefined) return '';
+                 let str = String(value);
+                 if (str.includes(',') || str.includes('\n') || str.includes('"')) {
+                     str = str.replace(/"/g, '""');
+                     return `"${str}"`;
+                 }
+                 return str;
+             }
+
+            function formatAsCsv(data) {
+                const headers = Object.keys(data);
+                const values = headers.map(header => escapeCsvValue(data[header]));
+                const csvRows = [
+                    headers.join(','),
+                    values.join(',')
+                ];
+                return csvRows.join('\n');
+            }
+
+
+            function downloadFile(content, filename, mimeType) {
+                try {
+                    const blob = new Blob([content], { type: mimeType });
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = filename;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(link.href);
+                    displayFeedback(`Fichier ${filename} généré pour le téléchargement.`, 'success');
+                } catch (error) {
+                    console.error("Erreur de téléchargement:", error);
+                    displayFeedback("Erreur lors de la création du fichier de téléchargement.", 'error');
+                }
+            }
+
+            function sendEmail(csvContent) {
+                 try {
+                     const recipient = "glaplante@csrlc.ca";
+                     const candidatNom = document.getElementById('candidatNom').value || 'Inconnu';
+                     const subject = `Candidature Bourses - ${candidatNom} - ${generateTimestamp()}`;
+
+                     const labeledData = getFormDataWithLabels();
+                     let body = `Nouvelle Candidature - Bourses de la Relève Sportive\n`;
+                     body += `Soumis le: ${new Date().toLocaleString('fr-CA')}\n`;
+                     body += "==================================================\n\n";
+                     for (const key in labeledData) {
+                         body += `${key}:\n${labeledData[key] || '-'}\n\n`;
+                     }
+                     body += "==================================================\n";
+                     body += "(Données également formatées en CSV ci-dessous pour import facile)\n\n";
+                     body += csvContent;
+
+
+                     const encodedSubject = encodeURIComponent(subject);
+                     const encodedBody = encodeURIComponent(body);
+                     const mailtoLink = `mailto:${recipient}?subject=${encodedSubject}&body=${encodedBody}`;
+
+                    if (mailtoLink.length > 10000) {
+                         console.warn("Mailto link is very long, might exceed limits.");
+                         displayFeedback("Les données sont trop longues pour l'envoi par courriel direct. Veuillez utiliser l'option Télécharger.", 'warning');
+                         return;
+                    }
+
+                     window.location.href = mailtoLink;
+                      displayFeedback("Préparation du courriel... Veuillez vérifier votre client de messagerie.", 'info');
+
+                 } catch (error) {
+                     console.error("Erreur Mailto:", error);
+                     displayFeedback("Impossible d'ouvrir le client de messagerie.", 'error');
+                 }
+            }
+
+            function displayFeedback(message, type = 'info') {
+                 feedbackDiv.textContent = message;
+                 feedbackDiv.className = 'mt-4 p-3 rounded text-center';
+                 if (type === 'success') {
+                     feedbackDiv.classList.add('bg-green-100', 'text-green-800', 'border', 'border-green-300');
+                 } else if (type === 'error') {
+                     feedbackDiv.classList.add('bg-red-100', 'text-red-800', 'border', 'border-red-300');
+                 } else if (type === 'warning') {
+                     feedbackDiv.classList.add('bg-yellow-100', 'text-yellow-800', 'border', 'border-yellow-300');
+                 } else {
+                     feedbackDiv.classList.add('bg-blue-100', 'text-blue-800', 'border', 'border-blue-300');
+                 }
+                 feedbackDiv.style.display = 'block';
+            }
+
+            downloadBtn.addEventListener('click', () => {
+                if (!validateForm(true)) return;
+                const data = getFormDataWithLabels();
+                const txtContent = formatAsText(data);
+                const csvContent = formatAsCsv(data);
+                const timestampFilenamePart = generateTimestamp();
+                const candidatNom = document.getElementById('candidatNom').value || 'Candidat';
+                const filenameBase = `Candidature_${candidatNom}_${timestampFilenamePart}`;
+
+                downloadFile(txtContent, `${filenameBase}.txt`, 'text/plain;charset=utf-8');
+                downloadFile(csvContent, `${filenameBase}.csv`, 'text/csv;charset=utf-8');
+            });
+
+            sendBtn.addEventListener('click', () => {
+                if (!validateForm(true)) return;
+                const data = getFormDataWithLabels();
+                const csvContent = formatAsCsv(data);
+                sendEmail(csvContent);
+            });
+
+        });
+    </script>
+
+</body>
+</html>

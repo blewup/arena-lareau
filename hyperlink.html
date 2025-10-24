@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="fr-CA">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lien vers le Sondage des Bourses</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        a.hyperlink {
+            display: block;
+            max-width: 90%;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            border-radius: 45px;
+            overflow: hidden;
+        }
+        a:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+        img {
+            display: block;
+            width: 100%;
+            height: auto;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    
+    <a class="hyperlink" href="./bourse.html" title="Cliquez pour accéder au sondage des bourses">
+        <img src="./images/hyperlink.png"
+             alt="Annonce des Bourses de la Relève Sportive - Cliquez ici"
+             onerror="this.alt='Erreur: Impossible de charger l\'image du lien. Cliquez ici pour le sondage.'">
+    </a>
+
+</body>
+</html>
