@@ -5,38 +5,81 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lien vers le Sondage des Bourses</title>
     <style>
+        :root {
+            --page-bg: rgb(29, 29, 27);
+            --accent-color: rgb(241, 94, 104);
+            --glow-color: rgba(241, 94, 104, 0.6);
+        }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            background-color: #f0f0f0;
+            height: 100vh;
+            background-color: var(--page-bg); /* Use page background color */
         }
+
         a.hyperlink {
             display: block;
-            max-width: 90%;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            height: 95vh;
+            width: auto;
+            box-shadow: 0 0 20px 8px var(--glow-color);
+            transition: height 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
             border-radius: 45px;
             overflow: hidden;
+            cursor: pointer;
         }
-        a:hover {
-            transform: scale(1.02);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+
+        a.hyperlink:hover {
+            height: 99vh;
+            box-shadow: 0 0 30px 12px var(--glow-color);
         }
+
         img {
             display: block;
             width: 100%;
-            height: auto;
+            height: 100%;
+            object-fit: cover;
             border: none;
         }
+
+         @media (orientation: landscape) {
+              a.hyperlink {
+                   max-height: 95vh;
+                   height: auto;
+                   width: 85vh;
+              }
+              a.hyperlink:hover {
+                   max-height: 99vh;
+                    height: auto;
+                    width: 89vh;
+              }
+         }
+         @media (max-width: 600px) {
+              a.hyperlink {
+                   height: auto;
+                   width: 80vw;
+                   max-height: 95vh;
+              }
+               a.hyperlink:hover {
+                    height: auto;
+                    width: 84vw;
+                    max-height: 99vh;
+               }
+         }
+
     </style>
 </head>
 <body>
-    
+
     <a class="hyperlink" href="./bourse.html" title="Cliquez pour accéder au sondage des bourses">
-        <img src="./images/hyperlink.png"
+        <img src="https://i.ibb.co/MxcmRPnn/hyperlink.png"
              alt="Annonce des Bourses de la Relève Sportive - Cliquez ici"
              onerror="this.alt='Erreur: Impossible de charger l\'image du lien. Cliquez ici pour le sondage.'">
     </a>
