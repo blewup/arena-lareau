@@ -862,6 +862,7 @@
                         <label for="candidatDob">Date de naissance :</label>
                         <div style="display: flex; align-items: center; position: relative;">
                             <input type="text" id="candidatDob" name="candidatDob" placeholder="JJ/MM/AAAA" data-section="candidat-section" required style="flex: 1;">
+                            <div class="tooltip candidatDob">Le candidat doit avoir entre 8 et 17 ans durant l'événement (27 oct - 21 nov 2025)</div>
                             <a id="calendarLink" title="Choisir une date">
                                 <i class="fas fa-calendar-alt fa-lg"></i>
                             </a>
@@ -875,7 +876,6 @@
                                 </div>
                             </div>                
                         </div>
-                        <div class="tooltip">Le candidat doit avoir entre 8 et 17 ans durant l'événement (27 oct - 21 nov 2025)</div>
                     </div>
                     <div class="form-group">
                         <label for="candidatSport">Sport pratiqué :</label>
@@ -2267,18 +2267,48 @@
                   console.log("formatDataRowForCsv: Ligne CSV générée (début):", dataRow.join(',').substring(0, 100));
                   return dataRow.join(',');
              }
+            function formatQuestionsAndAnswers() {
+                let qaString = "";
+                const questions = [
+                    { id: 'qSport', labelSelector: 'label[for="qSport"].question-title' },
+                    { id: 'qAmbitions', labelSelector: 'label[for="qAmbitions"].question-title' },
+                    { id: 'qFierte', labelSelector: 'label[for="qFierte"].question-title' },
+                    { id: 'qBesoins', labelSelector: 'label[for="qBesoins"].question-title' },
+                    { id: 'qAutres', labelSelector: 'label[for="qAutres"].question-title' }
+                ];
 
-            function sendCsvViaEmail() {
-                console.log("sendCsvViaEmail: Démarrage");
+                questions.forEach(q => {
+                    const textarea = document.getElementById(q.id);
+                    const labelElement = document.querySelector(q.labelSelector);
+                    if (textarea && labelElement) {
+                        let labelText = labelElement.textContent || labelElement.innerText || "";
+                        const optionalSpan = labelElement.querySelector('span');
+                        if (optionalSpan) {
+                             labelText = labelText.replace(optionalSpan.textContent, "").trim();
+                        }
+                        labelText = labelText.trim().replace(/:$/, '');
+
+                        const answer = textarea.value || "-";
+                        qaString += `${labelText} :\n${answer}\n\n`;
+                    } else {
+                        console.warn(`Could not find textarea or label for question ID: ${q.id}`);
+                    }
+                });
+                return qaString.trim();
+            }
+
+            function sendFormattedEmail() {
+                console.log("sendFormattedEmail: Démarrage");
                 if (!validateForm(true)) {
-                    console.log("sendCsvViaEmail: Validation échouée.");
+                    console.log("sendFormattedEmail: Validation échouée.");
                     return;
                 }
-                console.log("sendCsvViaEmail: Validation réussie.");
+                console.log("sendFormattedEmail: Validation réussie.");
 
                 if(sendBtn) sendBtn.disabled = true;
 
                 let csvDataRow;
+                let questionsAnswers;
                 let candidatName;
                 let timestampSubj;
                 let subject;
@@ -2288,52 +2318,61 @@
                 let mailtoLink;
 
                 try {
-                    console.log("sendCsvViaEmail: Appel de formatDataRowForCsv...");
+                    console.log("sendFormattedEmail: Appel de formatDataRowForCsv...");
                     csvDataRow = formatDataRowForCsv();
-                    console.log("sendCsvViaEmail: formatDataRowForCsv terminé.");
+                    console.log("sendFormattedEmail: formatDataRowForCsv terminé.");
+
+                    console.log("sendFormattedEmail: Appel de formatQuestionsAndAnswers...");
+                    questionsAnswers = formatQuestionsAndAnswers();
+                    console.log("sendFormattedEmail: formatQuestionsAndAnswers terminé.");
 
                     candidatName = candidatNomInput ? candidatNomInput.value : 'Inconnu';
                     timestampSubj = getFormattedTimestamp(false);
                     const recipient = "glaplante@csrlc.ca";
                     subject = `Nouvelle Candidature Bourse Sportive - ${candidatName} - ${timestampSubj}`;
-                    body = csvDataRow;
 
-                    console.log("sendCsvViaEmail: Sujet brut:", subject);
-                    console.log("sendCsvViaEmail: Corps brut (début):", body.substring(0, 100));
+                    const header1 = "====================================\n           Nouvelle Candidature\n====================================";
+                    const header2 = "====================================\n          Questions et Reponses :\n====================================";
+                    const footerEnd = "===================================="
+                    body = `${header1}\n\n${csvDataRow}\n\n${header2}\n\n${questionsAnswers}\n\n${footerEnd}`;
 
-                    console.log("sendCsvViaEmail: Encodage du sujet...");
+                    console.log("sendFormattedEmail: Sujet brut:", subject);
+                    console.log("sendFormattedEmail: Corps brut (début):", body.substring(0, 6000));
+
+                    console.log("sendFormattedEmail: Encodage du sujet...");
                     encodedSubject = encodeURIComponent(subject);
-                    console.log("sendCsvViaEmail: Encodage du corps...");
+                    console.log("sendFormattedEmail: Encodage du corps...");
                     encodedBody = encodeURIComponent(body);
-                    console.log("sendCsvViaEmail: Encodage terminé.");
+                    console.log("sendFormattedEmail: Encodage terminé.");
 
                     mailtoLink = `mailto:${recipient}?subject=${encodedSubject}&body=${encodedBody}`;
 
-                    console.log("sendCsvViaEmail: Mailto link length:", mailtoLink.length);
+                    console.log("sendFormattedEmail: Mailto link length:", mailtoLink.length);
 
                     if (mailtoLink.length > 2000) {
-                        console.warn("sendCsvViaEmail: Mailto link is very long, might exceed limits.");
+                        console.warn("sendFormattedEmail: Mailto link is very long, might exceed limits.");
                         displayFeedback(`Les données sont trop longues (${mailtoLink.length} caractères) pour l'envoi direct par courriel. Veuillez contacter l'administrateur.`, 'warning', 8000);
                         if(sendBtn) sendBtn.disabled = false;
                         return;
                     }
 
-                    console.log("sendCsvViaEmail: Tentative d'ouverture du mailto link...");
+                    console.log("sendFormattedEmail: Tentative d'ouverture du mailto link...");
                     window.location.href = mailtoLink;
                     displayFeedback(`Ouverture de votre client de messagerie pour envoyer les données...`, 'info', 5000);
 
                     setTimeout(() => {
-                         console.log("sendCsvViaEmail: Réactivation du bouton.");
+                         console.log("sendFormattedEmail: Réactivation du bouton.");
                          if(sendBtn) sendBtn.disabled = false;
                     }, 1500);
 
 
                 } catch (error) {
-                    console.error("Erreur détaillée dans sendCsvViaEmail:", error);
+                    console.error("Erreur détaillée dans sendFormattedEmail:", error);
                     displayFeedback(`Erreur lors de la préparation de l'e-mail: ${error.message}`, 'error');
                     if(sendBtn) sendBtn.disabled = false;
                 }
             }
+
             
              if (sendBtn) {
                  sendBtn.addEventListener('click', () => {
