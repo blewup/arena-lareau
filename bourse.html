@@ -678,27 +678,37 @@
         footer {
             text-align: center;
             margin-top: 40px;
-            padding: 20px;
+            padding: 20px 0;
             color: var(--accent-color);
             font-size: 0.9rem;
             line-height: 1.5;
         }
+        
         footer .footer-logos-container {
             display: flex;
             justify-content: center;
             align-items: center;
             flex-wrap: wrap;
             gap: 15px;
-            margin-bottom: 15px;
         }
+        
         footer .footer-logos-left,
         footer .footer-logos-right {
             display: flex;
             align-items: center;
             gap: 10px;
             flex-wrap: wrap;
-            justify-content: center;
             flex-basis: 100%;
+        }
+
+        footer .footer-logos-left {
+            justify-content: flex-start;
+            padding-left: 15px; 
+        }
+
+        footer .footer-logos-right {
+            justify-content: flex-end;
+            padding-right: 15px;
         }
 
         footer .footer-logo-link {
