@@ -2236,39 +2236,37 @@
                  }
                  return str;
             }
+             function formatDataRowForCsv() {
+                  console.log("formatDataRowForCsv: Début");
+                  const formElements = form.elements;
+                  const columnOrder = [ { id: 'candidatNom' }, { id: 'candidatVille' }, { id: 'candidatTel' }, { id: 'candidatDob' }, { id: 'candidatSport' }, { id: 'parentNom' }, { id: 'parentVille' }, { id: 'parentTel' }, { id: 'parentLien' }, { id: 'qSport' }, { id: 'qAmbitions' }, { id: 'qFierte' }, { id: 'qBesoins' }, { id: 'qAutres' } ];
+                  let rowData;
+                  try {
+                      rowData = columnOrder.map(col => {
+                          const element = formElements[col.id];
+                          if (!element) {
+                              console.warn(`Element non trouvé pour l'ID: ${col.id}`);
+                              return '';
+                          }
+                          return escapeCsvValue(element.value);
+                      });
+                  } catch (error) {
+                      console.error("Erreur dans map rowData:", error);
+                      throw new Error("Erreur lors de la lecture des données du formulaire.");
+                  }
 
-            function formatDataForSpreadsheet() {
-                 const formElements = form.elements;
-                 const columnOrder = [
-                     { id: 'candidatNom', label: "Nom du candidat" },
-                     { id: 'candidatVille', label: "Ville du candidat" },
-                     { id: 'candidatTel', label: "Téléphone du candidat" },
-                     { id: 'candidatDob', label: "Date de naissance" },
-                     { id: 'candidatSport', label: "Sport pratiqué" },
-                     { id: 'parentNom', label: "Nom du parent" },
-                     { id: 'parentVille', label: "Ville du parent" },
-                     { id: 'parentTel', label: "Téléphone du parent" },
-                     { id: 'parentLien', label: "Lien avec candidat" },
-                     { id: 'qSport', label: "DESCRIPTION DE VOTRE SPORT" },
-                     { id: 'qAmbitions', label: "VOS AMBITIONS ET OBJECTIFS" },
-                     { id: 'qFierte', label: "FIERTÉS ET RÉSULTATS" },
-                     { id: 'qBesoins', label: "VOS BESOINS" },
-                     { id: 'qAutres', label: "AUTRES COMMENTAIRES" }
-                 ];
+                  let timestamp;
+                  try {
+                      timestamp = getFormattedTimestamp(true);
+                  } catch (error) {
+                      console.error("Erreur dans getFormattedTimestamp:", error);
+                      throw new Error("Erreur lors de la génération de l'horodatage.");
+                  }
 
-                 const rowData = columnOrder.map(col => {
-                     const element = formElements[col.id];
-                     return element ? escapeCsvValue(element.value) : '';
-                 });
-
-                 const headers = ["Timestamp"].concat(columnOrder.map(col => escapeCsvValue(col.label)));
-                 const dataRow = [getFormattedTimestamp(true)].concat(rowData);
-                 const csvContent = [
-                     headers.join(','),
-                     dataRow.join(',')
-                 ].join('\n');
-                 return csvContent;
-            }
+                  const dataRow = [timestamp].concat(rowData);
+                  console.log("formatDataRowForCsv: Ligne CSV générée (début):", dataRow.join(',').substring(0, 100));
+                  return dataRow.join(',');
+             }
 
             function sendCsvViaEmail() {
                 console.log("sendCsvViaEmail: Démarrage");
