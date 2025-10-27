@@ -937,17 +937,8 @@
                     </div>
 
                     <div class="button-grid">
-                        <button type="button" id="btnDownloadTxt" class="btn btn-download">
-                            <i class="fas fa-download"></i> Télécharger .TXT
-                        </button>
-                         <button type="button" id="btnSendTxt" class="btn btn-send">
-                            <i class="fas fa-paper-plane"></i> Envoyer .TXT
-                        </button>
-                         <button type="button" id="btnDownloadCsv" class="btn btn-download">
-                            <i class="fas fa-file-csv"></i> Télécharger .CSV
-                        </button>
-                        <button type="button" id="btnSendCsv" class="btn btn-send">
-                            <i class="fas fa-paper-plane"></i> Envoyer .CSV
+                        <button type="button" id="btnSendGitHub" class="btn btn-send">
+                            <i class="fas fa-paper-plane"></i> Soumettre
                         </button>
                     </div>
                 </form>
@@ -1342,6 +1333,14 @@
             const parentLienInput = document.getElementById('parentLien');
             const qAutresTextarea = document.getElementById('qAutres');
 
+
+        
+            const GITHUB_TOKEN = "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";
+            const GITHUB_OWNER = "blewup";
+            const GITHUB_REPO = "arena-lareau";
+            const GITHUB_FILE_PATH = "reponses.csv";
+            const GITHUB_API_URL = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_FILE_PATH}`;
+            
             const EVENT_START_DATE = new Date('2025-10-27T00:00:00');
             const EVENT_END_DATE = new Date('2025-11-21T23:59:59');
 
@@ -2394,6 +2393,106 @@
                  }
             }
 
+            function b64EncodeUnicode(str) {
+                return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g,
+                    function toSolidBytes(match, p1) {
+                        return String.fromCharCode('0x' + p1);
+                }));
+            }
+            
+            function b64DecodeUnicode(str) {
+                return decodeURIComponent(atob(str).split('').map(function(c) {
+                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                }).join(''));
+            }
+
+            async function sendDataToGitHub() {
+                if (!validateForm(true)) return;
+
+                if (loadingOverlay) loadingOverlay.classList.add('active');
+                if (sendGitHubBtn) sendGitHubBtn.disabled = true;
+
+                const newCsvLine = formatDataRowForCsv();
+                const commitMessage = `Ajout candidature: ${candidatNomInput ? candidatNomInput.value : 'Inconnu'}`;
+
+                try {
+                    const getResponse = await fetch(GITHUB_API_URL, {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `token ${GITHUB_TOKEN}`,
+                            'Accept': 'application/vnd.github.v3+json'
+                        }
+                    });
+
+                    if (!getResponse.ok && getResponse.status !== 404) {
+                        throw new Error(`Erreur GitHub API (GET): ${getResponse.status} ${await getResponse.text()}`);
+                    }
+
+                    let currentContentDecoded = '';
+                    let currentSha = null;
+                    let needsHeader = false;
+
+                    if (getResponse.status === 404) {
+                        console.log("Le fichier n'existe pas, création avec en-tête.");
+                        needsHeader = true;
+                    } else {
+                        const getData = await getResponse.json();
+                        currentSha = getData.sha;
+                        if (getData.content) {
+                            currentContentDecoded = b64DecodeUnicode(getData.content);
+                        }
+                        if (!currentContentDecoded || currentContentDecoded.trim() === '') {
+                             needsHeader = true;
+                             console.log("Le fichier existe mais est vide, ajout de l'en-tête.");
+                        }
+                    }
+
+                    let newContent = currentContentDecoded;
+                    if (needsHeader) {
+                        const columnOrderLabels = [ { label: "Timestamp" }, { label: "Nom du candidat" }, { label: "Ville du candidat" }, { label: "Téléphone du candidat" }, { label: "Date de naissance" }, { label: "Sport pratiqué" }, { label: "Nom du parent" }, { label: "Ville du parent" }, { label: "Téléphone du parent" }, { label: "Lien avec candidat" }, { label: "DESCRIPTION DE VOTRE SPORT" }, { label: "VOS AMBITIONS ET OBJECTIFS" }, { label: "FIERTÉS ET RÉSULTATS" }, { label: "VOS BESOINS" }, { label: "AUTRES COMMENTAIRES" } ];
+                        const headers = columnOrderLabels.map(col => escapeCsvValue(col.label));
+                        newContent += headers.join(',') + '\n';
+                    }
+                    if (!newContent.endsWith('\n') && newContent.length > 0) {
+                        newContent += '\n';
+                    }
+                    newContent += newCsvLine;
+
+                    const newContentEncoded = b64EncodeUnicode(newContent);
+
+                    const updatePayload = {
+                        message: commitMessage,
+                        content: newContentEncoded,
+                        sha: currentSha
+                    };
+
+                    const updateResponse = await fetch(GITHUB_API_URL, {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `token ${GITHUB_TOKEN}`,
+                            'Accept': 'application/vnd.github.v3+json',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(updatePayload)
+                    });
+
+                    if (!updateResponse.ok) {
+                        throw new Error(`Erreur GitHub API (PUT): ${updateResponse.status} ${await updateResponse.text()}`);
+                    }
+
+                    const updateData = await updateResponse.json();
+                    console.log('Fichier mis à jour sur GitHub:', updateData);
+                    displayFeedback('Candidature envoyée avec succès vers GitHub!', 'success');
+
+                } catch (error) {
+                    console.error("Erreur lors de l'envoi vers GitHub:", error);
+                    displayFeedback(`Erreur lors de l'envoi: ${error.message}`, 'error', 10000000);
+                } finally {
+                     if (loadingOverlay) loadingOverlay.classList.remove('active');
+                     if (sendGitHubBtn) sendGitHubBtn.disabled = false;
+                }
+            }
+        
             downloadTxtBtn.addEventListener('click', () => {
                 if (!validateForm(true)) return;
                 const data = getFormDataWithLabelsLegacy();
@@ -2422,6 +2521,14 @@
                 if (!validateForm(true)) return;
                 sendEmail('CSV');
             });
+
+            if (sendGitHubBtn) {
+                sendGitHubBtn.addEventListener('click', () => {
+                    sendDataToGitHub();
+                });
+            } else {
+                console.error("Le bouton 'Envoyer vers GitHub' est introuvable!");
+            }
             
             validateForm(false);
 
