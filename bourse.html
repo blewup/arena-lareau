@@ -2268,38 +2268,65 @@
                  return csvContent;
             }
 
-             function getFormDataWithLabelsLegacy() {
-                  const formData = new FormData(form);
-                  const data = {};
-                   const labels = {
-                       candidatNom: "Nom du candidat",
-                       candidatVille: "Ville du candidat",
-                       candidatTel: "Téléphone du candidat",
-                       candidatDob: "Date de naissance",
-                       candidatSport: "Sport pratiqué",
-                       parentNom: "Nom du parent",
-                       parentVille: "Ville du parent",
-                       parentTel: "Téléphone du parent",
-                       parentLien: "Lien avec candidat",
-                       qSport: "DESCRIPTION DE VOTRE SPORT",
-                       qAmbitions: "VOS AMBITIONS ET OBJECTIFS",
-                       qFierte: "FIERTÉS ET RÉSULTATS",
-                       qBesoins: "VOS BESOINS",
-                       qAutres: "AUTRES COMMENTAIRES"
-                   };
-                   for (const key of Object.keys(labels)) {
-                       const element = form.elements[key];
-                       if (element) { data[labels[key]] = element.value || ''; }
-                   }
-                  return data;
-              }
+            function getFormDataWithLabelsLegacy() {
+                const formData = new FormData(form);
+                const data = {};
+                const labels = {
+                    candidatNom: "Nom du candidat",
+                    candidatVille: "Ville du candidat",
+                    candidatTel: "Téléphone du candidat",
+                    candidatDob: "Date de naissance",
+                    candidatSport: "Sport pratiqué",
+                    parentNom: "Nom du parent",
+                    parentVille: "Ville du parent",
+                    parentTel: "Téléphone du parent",
+                    parentLien: "Lien avec candidat",
+                    qSport: "DESCRIPTION DE VOTRE SPORT",
+                    qAmbitions: "VOS AMBITIONS ET OBJECTIFS",
+                    qFierte: "FIERTÉS ET RÉSULTATS",
+                    qBesoins: "VOS BESOINS",
+                    qAutres: "AUTRES COMMENTAIRES"
+                };
+                for (const key of Object.keys(labels)) {
+                    const element = form.elements[key];
+                    if (element) { data[labels[key]] = element.value || ''; }
+                }
+                return data;
+            }
 
-             function formatAsTextLegacy(data) {
-                 let text = `Candidature - Bourses de la Relève Sportive - ${getFilenameTimestamp()}\n`;
-                 text += "==================================================\n\n";
-                 for (const key in data) { text += `${key}:\n${data[key] || '-'}\n\n`; }
-                 return text;
-             }
+            function formatAsTextTable(data) {
+                let text = `Candidature - Bourses de la Relève Sportive - ${getFilenameTimestamp()}\n`;
+                text += "==================================================\n\n";
+                let maxLabelLength = 0;
+                for (const key in data) {
+                    if (key.length > maxLabelLength) {
+                        maxLabelLength = key.length;
+                    }
+                }
+                maxLabelLength += 2;
+                for (const key in data) {
+                    const labelPadded = key.padEnd(maxLabelLength, ' ');
+                    const answerLines = (data[key] || '-').split('\n');
+                    text += `${labelPadded}: ${answerLines[0]}\n`;
+                    for (let i = 1; i < answerLines.length; i++) {
+                        text += `${' '.repeat(maxLabelLength + 2)}${answerLines[i]}\n`;
+                    }
+                    text += "\n";
+                }
+                return text.replace(/\n\n$/, '\n');
+            }
+            function formatAsTextRaw(data) {
+                let text = `Candidature - Bourses de la Relève Sportive - ${getFilenameTimestamp()}\n`;
+                text += "==================================================\n\n";
+                for (const key in data) {
+                    text += `${key}:\n${data[key] || '-'}\n\n`;
+                }
+                return text.replace(/\n\n$/, '\n');
+            }
+            function getFormDataWithLabels() {
+                const data = {}; const labels = { candidatNom: "Nom du candidat", candidatVille: "Ville du candidat", candidatTel: "Téléphone du candidat", candidatDob: "Date de naissance", candidatSport: "Sport pratiqué", parentNom: "Nom du parent", parentVille: "Ville du parent", parentTel: "Téléphone du parent", parentLien: "Lien avec candidat", qSport: "DESCRIPTION DE VOTRE SPORT", qAmbitions: "VOS AMBITIONS ET OBJECTIFS", qFierte: "FIERTÉS ET RÉSULTATS", qBesoins: "VOS BESOINS", qAutres: "AUTRES COMMENTAIRES" };
+                for (const key of Object.keys(labels)) { const element = form.elements[key]; if (element) { data[labels[key]] = element.value || ''; } } return data;
+            }
 
             function downloadFile(content, filename, mimeType) {
                 try {
@@ -2318,26 +2345,32 @@
                 }
             }
 
-            function sendEmail(content, formatType = 'CSV') {
+            function sendEmail(content, formatType) {
                  try {
                      const recipient = "glaplante@csrlc.ca";
                      const candidatNom = document.getElementById('candidatNom').value || 'Inconnu';
                      const timestampSubj = getFormattedTimestamp(false);
                      const subject = `Bourses sportive - ${candidatNom} - ${timestampSubj}`;
-
-                     const labeledData = getFormDataWithLabelsLegacy();
-                     let body = `Nouvelle Candidature - Bourses de la Relève Sportive\n`;
-                     body += `Soumise le: ${new Date().toLocaleString('fr-CA')}\n`;
-                     body += "==================================================\n\n";
-                     for (const key in labeledData) {
-                         body += `${key}:\n${labeledData[key] || '-'}\n\n`;
-                     }
-                     body += "==================================================\n";
+                     const labeledData = getFormDataWithLabels();
+                     const tableFormat = formatAsTextTable(labeledData);
+                     const rawFormat = formatAsTextRaw(labeledData);
+                     body = '';
                      if (formatType === 'CSV') {
-                        body += "(Données également formatées en CSV ci-dessous pour import facile)\n\n";
-                        body += content;
-                     } else {
-                        body = content;
+                        body = `Nouvelle Candidature - Bourses de la Relève Sportive\n`;
+                        body += `Soumise le: ${new Date().toLocaleString('fr-CA')}\n`;
+                        body += "==================================================\n";
+                        body += "          FORMAT TABLEAU (Aligné)\n";
+                        body += "==================================================\n\n";
+                        body += tableFormat;
+                        body += "\n\n==================================================\n"
+                     } else if (formatType === 'TXT') {
+                         body = `Nouvelle Candidature - Bourses de la Relève Sportive\n`;
+                         body += `Soumise le: ${new Date().toLocaleString('fr-CA')}\n`;                          
+                         body += "==================================================\n";
+                         body += "            FORMAT BRUT (Simple)\n";
+                         body += "==================================================\n\n";
+                         body += rawFormat;
+                         body += "\n\n==================================================\n";
                      }
 
                      const encodedSubject = encodeURIComponent(subject);
@@ -2362,18 +2395,16 @@
             downloadTxtBtn.addEventListener('click', () => {
                 if (!validateForm(true)) return;
                 const data = getFormDataWithLabelsLegacy();
-                const txtContent = formatAsTextLegacy(data);
+                const txtContent = formatAsTextTable(data);
                 const timestampFilenamePart = getFilenameTimestamp();
                 const candidatNom = document.getElementById('candidatNom').value || 'Candidat';
-                const filenameBase = `Candidature_${candidatNom}_${timestampFilenamePart}`;
+                const filenameBase = `${candidatNom}-${timestampFilenamePart}`;
                 downloadFile(txtContent, `${filenameBase}.txt`, 'text/plain;charset=utf-8');
             });
 
              sendTxtBtn.addEventListener('click', () => {
                  if (!validateForm(true)) return;
-                 const data = getFormDataWithLabelsLegacy();
-                 const txtContent = formatAsTextLegacy(data);
-                 sendEmail(txtContent, 'TXT');
+                 sendEmail('TXT');
              });
 
             downloadCsvBtn.addEventListener('click', () => {
@@ -2381,14 +2412,13 @@
                 const csvContent = formatDataForSpreadsheet();
                 const timestampFilenamePart = getFilenameTimestamp();
                 const candidatNom = document.getElementById('candidatNom').value || 'Candidat';
-                const filenameBase = `Candidature_${candidatNom}_${timestampFilenamePart}`;
+                const filenameBase = `${candidatNom}-${timestampFilenamePart}`;
                 downloadFile(csvContent, `${filenameBase}.csv`, 'text/csv;charset=utf-f-8');
             });
 
             sendCsvBtn.addEventListener('click', () => {
                 if (!validateForm(true)) return;
-                const csvContent = formatDataForSpreadsheet();
-                sendEmail(csvContent, 'CSV');
+                sendEmail('CSV');
             });
             
             validateForm(false);
