@@ -1466,6 +1466,21 @@
     </footer>
 
     <script>
+
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        function scrollToBottom() {
+            window.scrollTo({
+                top: document.body.scrollHeight,
+                behavior: 'smooth'
+            });
+        }
+        
         document.addEventListener('DOMContentLoaded', function() {
             let hasAttemptedSubmit = false;
             const form = document.getElementById('bourseSurveyForm');
@@ -1520,20 +1535,6 @@
                     });
                 }
             });
-
-            function scrollToTop() {
-                window.scrollTo({
-                    top: 0,
-                    behavior: 'smooth'
-                });
-            }
-
-            function scrollToBottom() {
-                window.scrollTo({
-                    top: document.body.scrollHeight,
-                    behavior: 'smooth'
-                });
-            }
             
             function updateTooltipPosition(e) {
                 const tooltip = document.getElementById('alt-tooltip');
