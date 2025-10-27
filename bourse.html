@@ -2277,17 +2277,36 @@
 
                 if(sendBtn) sendBtn.disabled = true;
 
-                try {
-                    const csvDataRow = formatDataRowForCsv();
-                    const candidatName = candidatNomInput ? candidatNomInput.value : 'Inconnu';
-                    const timestampSubj = getFormattedTimestamp(false);
-                    const recipient = "glaplante@csrlc.ca";
-                    const subject = `Nouvelle Candidature Bourse Sportive - ${candidatName} - ${timestampSubj}`;
-                    const body = csvDataRow;
+                let csvDataRow;
+                let candidatName;
+                let timestampSubj;
+                let subject;
+                let body;
+                let encodedSubject;
+                let encodedBody;
+                let mailtoLink;
 
-                    const encodedSubject = encodeURIComponent(subject);
-                    const encodedBody = encodeURIComponent(body);
-                    const mailtoLink = `mailto:${recipient}?subject=${encodedSubject}&body=${encodedBody}`;
+                try {
+                    console.log("sendCsvViaEmail: Appel de formatDataRowForCsv...");
+                    csvDataRow = formatDataRowForCsv();
+                    console.log("sendCsvViaEmail: formatDataRowForCsv terminé.");
+
+                    candidatName = candidatNomInput ? candidatNomInput.value : 'Inconnu';
+                    timestampSubj = getFormattedTimestamp(false);
+                    const recipient = "glaplante@csrlc.ca";
+                    subject = `Nouvelle Candidature Bourse Sportive - ${candidatName} - ${timestampSubj}`;
+                    body = csvDataRow;
+
+                    console.log("sendCsvViaEmail: Sujet brut:", subject);
+                    console.log("sendCsvViaEmail: Corps brut (début):", body.substring(0, 100));
+
+                    console.log("sendCsvViaEmail: Encodage du sujet...");
+                    encodedSubject = encodeURIComponent(subject);
+                    console.log("sendCsvViaEmail: Encodage du corps...");
+                    encodedBody = encodeURIComponent(body);
+                    console.log("sendCsvViaEmail: Encodage terminé.");
+
+                    mailtoLink = `mailto:${recipient}?subject=${encodedSubject}&body=${encodedBody}`;
 
                     console.log("sendCsvViaEmail: Mailto link length:", mailtoLink.length);
 
@@ -2298,21 +2317,23 @@
                         return;
                     }
 
+                    console.log("sendCsvViaEmail: Tentative d'ouverture du mailto link...");
                     window.location.href = mailtoLink;
                     displayFeedback(`Ouverture de votre client de messagerie pour envoyer les données...`, 'info', 5000);
 
                     setTimeout(() => {
+                         console.log("sendCsvViaEmail: Réactivation du bouton.");
                          if(sendBtn) sendBtn.disabled = false;
                     }, 1500);
 
 
                 } catch (error) {
-                    console.error("Erreur lors de la création du lien mailto:", error);
-                    displayFeedback("Erreur lors de la préparation de l'e-mail.", 'error');
-                    if(sendBtn) sendBtn.disabled = false; // Re-enable on error
+                    console.error("Erreur détaillée dans sendCsvViaEmail:", error);
+                    displayFeedback(`Erreur lors de la préparation de l'e-mail: ${error.message}`, 'error');
+                    if(sendBtn) sendBtn.disabled = false;
                 }
             }
-
+            
              if (sendBtn) {
                  sendBtn.addEventListener('click', () => {
                      console.log("Bouton 'Soumettre' cliqué."); // DEBUG
