@@ -2267,14 +2267,23 @@
                   console.log("formatDataRowForCsv: Ligne CSV générée (début):", dataRow.join(',').substring(0, 100));
                   return dataRow.join(',');
              }
-            function formatQuestionsAndAnswers() {
-                let qaString = "";
-                const questions = [
-                    { id: 'qSport', labelSelector: 'label[for="qSport"].question-title' },
-                    { id: 'qAmbitions', labelSelector: 'label[for="qAmbitions"].question-title' },
-                    { id: 'qFierte', labelSelector: 'label[for="qFierte"].question-title' },
-                    { id: 'qBesoins', labelSelector: 'label[for="qBesoins"].question-title' },
-                    { id: 'qAutres', labelSelector: 'label[for="qAutres"].question-title' }
+             function formatQuestionsAndAnswers() {
+                 let qaString = "";
+                 const questions = [
+                     { id: 'candidatNom', labelSelector: 'label[for="candidatNom"]' },
+                     { id: 'candidatVille', labelSelector: 'label[for="candidatVille"]' },
+                     { id: 'candidatTel', labelSelector: 'label[for="candidatTel"]' },
+                     { id: 'candidatDob', labelSelector: 'label[for="candidatDob"]' },
+                     { id: 'candidatSport', labelSelector: 'label[for="candidatSport"]' },
+                     { id: 'parentNom', labelSelector: 'label[for="parentNom"]' },
+                     { id: 'parentVille', labelSelector: 'label[for="parentVille"]' },
+                     { id: 'parentTel', labelSelector: 'label[for="parentTel"]' },
+                     { id: 'parentLien', labelSelector: 'label[for="parentLien"]' },
+                     { id: 'qSport', labelSelector: 'label[for="qSport"].question-title' },
+                     { id: 'qAmbitions', labelSelector: 'label[for="qAmbitions"].question-title' },
+                     { id: 'qFierte', labelSelector: 'label[for="qFierte"].question-title' },
+                     { id: 'qBesoins', labelSelector: 'label[for="qBesoins"].question-title' },
+                     { id: 'qAutres', labelSelector: 'label[for="qAutres"].question-title' }
                 ];
 
                 questions.forEach(q => {
@@ -2298,86 +2307,85 @@
             }
 
             function sendFormattedEmail() {
-                console.log("sendFormattedEmail: Démarrage");
-                if (!validateForm(true)) {
-                    console.log("sendFormattedEmail: Validation échouée.");
-                    return;
-                }
-                console.log("sendFormattedEmail: Validation réussie.");
+               console.log("sendFormattedEmail: Démarrage");
+               if (!validateForm(true)) {
+                   console.log("sendFormattedEmail: Validation échouée.");
+                   return;
+               }
+               console.log("sendFormattedEmail: Validation réussie.");
 
-                if(sendBtn) sendBtn.disabled = true;
+               if(sendBtn) sendBtn.disabled = true;
 
-                let csvDataRow;
-                let questionsAnswers;
-                let candidatName;
-                let timestampSubj;
-                let subject;
-                let body;
-                let encodedSubject;
-                let encodedBody;
-                let mailtoLink;
+               let csvDataRow;
+               let questionsAnswers;
+               let candidatName;
+               let timestampSubj;
+               let subject;
+               let body;
+               let encodedSubject;
+               let encodedBody;
+               let mailtoLink;
 
-                try {
-                    console.log("sendFormattedEmail: Appel de formatDataRowForCsv...");
-                    csvDataRow = formatDataRowForCsv();
-                    console.log("sendFormattedEmail: formatDataRowForCsv terminé.");
+               try {
+                   console.log("sendFormattedEmail: Appel de formatDataRowForCsv...");
+                   csvDataRow = formatDataRowForCsv();
+                   console.log("sendFormattedEmail: formatDataRowForCsv terminé.");
+                   console.log("sendFormattedEmail: Appel de formatQuestionsAndAnswers...");
+                   questionsAnswers = formatQuestionsAndAnswers();
+                   console.log("sendFormattedEmail: formatQuestionsAndAnswers terminé.");
 
-                    console.log("sendFormattedEmail: Appel de formatQuestionsAndAnswers...");
-                    questionsAnswers = formatQuestionsAndAnswers();
-                    console.log("sendFormattedEmail: formatQuestionsAndAnswers terminé.");
+                   candidatName = candidatNomInput ? candidatNomInput.value : 'Inconnu';
+                   timestampSubj = getFormattedTimestamp(false);
+                   const recipient = "glaplante@csrlc.ca";
+                   subject = `Nouvelle Candidature Bourse Sportive - ${candidatName} - ${timestampSubj}`;
 
-                    candidatName = candidatNomInput ? candidatNomInput.value : 'Inconnu';
-                    timestampSubj = getFormattedTimestamp(false);
-                    const recipient = "glaplante@csrlc.ca";
-                    subject = `Nouvelle Candidature Bourse Sportive - ${candidatName} - ${timestampSubj}`;
+                   const header1 = "====================================\n           Nouvelle Candidature\n====================================";
+                   const header2 = "====================================\n          Questions et Reponses :\n====================================";
+                   const footerEnd = "===================================="
+                   body = `${header1}\n\n${csvDataRow}\n\n${header2}\n\n${questionsAnswers}\n\n${footerEnd}`;
 
-                    const header1 = "====================================\n           Nouvelle Candidature\n====================================";
-                    const header2 = "====================================\n          Questions et Reponses :\n====================================";
-                    const footerEnd = "===================================="
-                    body = `${header1}\n\n${csvDataRow}\n\n${header2}\n\n${questionsAnswers}\n\n${footerEnd}`;
+                   console.log("sendFormattedEmail: Sujet brut:", subject);
+                   console.log("sendFormattedEmail: Corps brut (début):", body.substring(0, 6000));
 
-                    console.log("sendFormattedEmail: Sujet brut:", subject);
-                    console.log("sendFormattedEmail: Corps brut (début):", body.substring(0, 6000));
+                   console.log("sendFormattedEmail: Encodage du sujet...");
+                   encodedSubject = encodeURIComponent(subject);
+                   console.log("sendFormattedEmail: Encodage du corps...");
+                   encodedBody = encodeURIComponent(body);
+                   console.log("sendFormattedEmail: Encodage terminé.");
 
-                    console.log("sendFormattedEmail: Encodage du sujet...");
-                    encodedSubject = encodeURIComponent(subject);
-                    console.log("sendFormattedEmail: Encodage du corps...");
-                    encodedBody = encodeURIComponent(body);
-                    console.log("sendFormattedEmail: Encodage terminé.");
+                   mailtoLink = `mailto:${recipient}?subject=${encodedSubject}&body=${encodedBody}`;
 
-                    mailtoLink = `mailto:${recipient}?subject=${encodedSubject}&body=${encodedBody}`;
+                   console.log("sendFormattedEmail: Mailto link length:", mailtoLink.length);
 
-                    console.log("sendFormattedEmail: Mailto link length:", mailtoLink.length);
+                   if (mailtoLink.length > 2000) {
+                       console.warn("sendFormattedEmail: Mailto link is very long, might exceed limits.");
+                       displayFeedback(`Les données sont trop longues (${mailtoLink.length} caractères) pour l'envoi direct par courriel. Veuillez contacter l'administrateur.`, 'warning', 8000);
+                       if(sendBtn) sendBtn.disabled = false;
+                       return;
+                   }
 
-                    if (mailtoLink.length > 2000) {
-                        console.warn("sendFormattedEmail: Mailto link is very long, might exceed limits.");
-                        displayFeedback(`Les données sont trop longues (${mailtoLink.length} caractères) pour l'envoi direct par courriel. Veuillez contacter l'administrateur.`, 'warning', 8000);
-                        if(sendBtn) sendBtn.disabled = false;
-                        return;
-                    }
+                   console.log("sendFormattedEmail: Tentative d'ouverture du mailto link...");
+                   window.location.href = mailtoLink;
+                   displayFeedback(`Ouverture de votre client de messagerie pour envoyer les données...`, 'info', 5000);
 
-                    console.log("sendFormattedEmail: Tentative d'ouverture du mailto link...");
-                    window.location.href = mailtoLink;
-                    displayFeedback(`Ouverture de votre client de messagerie pour envoyer les données...`, 'info', 5000);
-
-                    setTimeout(() => {
-                         console.log("sendFormattedEmail: Réactivation du bouton.");
-                         if(sendBtn) sendBtn.disabled = false;
-                    }, 1500);
+                   setTimeout(() => {
+                       console.log("sendFormattedEmail: Réactivation du bouton.");
+                       if(sendBtn) sendBtn.disabled = false;
+                   }, 1500);
 
 
-                } catch (error) {
-                    console.error("Erreur détaillée dans sendFormattedEmail:", error);
-                    displayFeedback(`Erreur lors de la préparation de l'e-mail: ${error.message}`, 'error');
-                    if(sendBtn) sendBtn.disabled = false;
-                }
-            }
+                 } catch (error) {
+                      console.error("Erreur détaillée dans sendFormattedEmail:", error);
+                      displayFeedback(`Erreur lors de la préparation de l'e-mail: ${error.message}`, 'error');
+                      if(sendBtn) sendBtn.disabled = false;
+                 }
+             }
 
             
              if (sendBtn) {
                  sendBtn.addEventListener('click', () => {
                      console.log("Bouton 'Soumettre' cliqué."); // DEBUG
-                     sendCsvViaEmail();
+                     sendFormattedEmail();
                  });
              } else {
                  console.error("Le bouton 'Soumettre' (btnSend) est introuvable!");
