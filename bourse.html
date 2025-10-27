@@ -679,36 +679,79 @@
             text-align: center;
             margin-top: 40px;
             padding: 20px;
-            color: #ccc;
+            color: var(--accent-color);
             font-size: 0.9rem;
             line-height: 1.5;
         }
-         footer a {
-             color: #eee;
-             text-decoration: underline;
-             cursor: pointer;
-         }
-         footer a:hover {
-              color: var(--calendar-hover-bg);
-         }
-         footer span.clickable-date {
-             cursor: pointer;
-             text-decoration: underline;
-              color: #eee;
-         }
-         footer span.clickable-date:hover {
-               color: green;
-         }
-         footer .footer-logo {
-            display: block; /* Default for mobile */
-            margin: 15px auto 0; /* Center below text on mobile */
-            width: 100px; /* Adjust size as needed */
+        footer .footer-logos-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        footer .footer-logos-left,
+        footer .footer-logos-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            flex-basis: 100%;
+        }
+
+        footer .footer-logo-link {
+            display: inline-block;
+            line-height: 0;
+            transition: transform 0.2s ease;
+        }
+        footer .footer-logo-link:hover {
+            transform: scale(1.1);
+            color: var(--calendar-hover-bg);
+        }
+        footer .footer-logo-link img {
+            max-height: 30px;
+            width: auto;
+            vertical-align: middle;
+        }
+        footer .footer-logo-link i.fa-facebook {
+            font-size: 28px;
+            color: #eee;
+            vertical-align: middle;
+            transition: color 0.2s ease;
+        }
+        footer .footer-logo-link:hover i.fa-facebook {
+            color: var(--calendar-hover-bg);
+        }
+        
+        footer a {
+            color: #eee;
+            cursor: pointer;
+        }
+        footer a:hover {
+            color: var(--calendar-hover-bg);
+            text-decoration: underline;             
+        }
+        footer span.clickable-date {
+            cursor: pointer;
+            text-decoration: underline;
+            color: #eee;
+        }
+        footer span.clickable-date:hover {
+            color: var(--calendar-hover-bg);
+            text-decoration: underline;
+        }
+        footer .footer-logo {
+            display: block;
+            margin: 15px auto 0;
+            width: 100px;
             height: auto;
             transition: transform 0.2s ease;
-         }
-         footer .footer-logo:hover {
+        }
+        footer .footer-logo:hover {
             transform: scale(1.05);
-         }
+        }
         
         .autocomplete-container {
             position: relative;
@@ -1319,10 +1362,50 @@
     </datalist>
 
     <footer>
-        <a href="https://www.coupdoeil.info/actualites/bourses-de-soutien-a-la-releve-sportive-de-larena-regional-lareau-les-candidatures-acceptees-jusquau-8-septembre/" target="_blank" rel="noopener noreferrer" title="Voir l'article sur Coup d'œil">
-            <img src="./images/logo-coup-doeil.png" alt="Logo Coup d'œil" class="footer-logo"
+        <div class="footer-logos-left">
+            <a href="https://www.desjardins.com/qc/fr.html" target="_blank" rel="noopener noreferrer" class="footer-logo-link" title="Desjardins">
+                <img src="./images/desjardins.svg" alt="Logo Desjardins" onerror="this.style.display='none'; this.alt='Erreur logo Desjardins';">
+            </a>
+            <a href="https://csrlc.ca/" target="_blank" rel="noopener noreferrer" class="footer-logo-link" title="Aréna Régional Lareau">
+                <img src="./images/arena.png" alt="Logo Aréna Régional Lareau" onerror="this.style.display='none'; this.alt='Erreur logo Aréna';">
+            </a>
+            <a href="https://www.facebook.com/arenaregionallareau" target="_blank" rel="noopener noreferrer" class="footer-logo-link" title="Facebook Aréna Régional Lareau">
+                <i class="fab fa-facebook"></i> <!-- Use fab for brands -->
+            </a>
+        </div>
+             <!-- Right Logos (Cities) -->
+        <div class="footer-logos-right">
+            <a href="https://www.napierville.ca/" target="_blank" rel="noopener noreferrer" class="footer-logo-link" title="Napierville">
+                <img src="./images/napierville.png" alt="Logo Napierville" onerror="this.style.display='none'; this.alt='Erreur logo Napierville';">
+            </a>
+            <a href="https://www.st-cypriendenapierville.com/accueil" target="_blank" rel="noopener noreferrer" class="footer-logo-link" title="Saint-Cyprien-de-Napierville">
+                <img src="./images/saint-cyprien.png" alt="Logo Saint-Cyprien" onerror="this.style.display='none'; this.alt='Erreur logo St-Cyprien';">
+            </a>
+            <a href="https://municipalite.saint-valentin.qc.ca/" target="_blank" rel="noopener noreferrer" class="footer-logo-link" title="Saint-Valentin">
+                <img src="./images/saint-valentin.png" alt="Logo Saint-Valentin" onerror="this.style.display='none'; this.alt='Erreur logo St-Valentin';">
+            </a>
+            <a href="https://www.saint-jacques-le-mineur.ca/" target="_blank" rel="noopener noreferrer" class="footer-logo-link" title="Saint-Jacques-le-Mineur">
+                <img src="./images/saint-jacques.png" alt="Logo Saint-Jacques-le-Mineur" onerror="this.style.display='none'; this.alt='Erreur logo St-Jacques';">
+            </a>
+            <a href="https://www.st-blaise.ca/" target="_blank" rel="noopener noreferrer" class="footer-logo-link" title="Saint-Blaise-sur-Richelieu">
+                <img src="./images/saint-blaise.png" alt="Logo Saint-Blaise-sur-Richelieu" onerror="this.style.display='none'; this.alt='Erreur logo St-Blaise';">
+            </a>
+             <a href="https://www.ileauxnoix.com/fr/index.html" target="_blank" rel="noopener noreferrer" class="footer-logo-link" title="Saint-Paul-de-l'Île-aux-Noix">
+                <img src="./images/saint-paul.png" alt="Logo Saint-Paul-de-l'Île-aux-Noix" onerror="this.style.display='none'; this.alt='Erreur logo St-Paul';">
+            </a>
+            <a href="https://www.canton.hemmingford.ca/" target="_blank" rel="noopener noreferrer" class="footer-logo-link" title="Hemmingford (Canton)">
+                <img src="./images/hemmingford.png" alt="Logo Hemmingford (Canton)" onerror="this.style.display='none'; this.alt='Erreur logo Hemmingford';">
+            </a>
+            <a href="https://www.municipalite-de-saint-bernard-de-lacolle.ca/" target="_blank" rel="noopener noreferrer" class="footer-logo-link" title="Saint-Bernard-de-Lacolle">
+                <img src="./images/saint-bernard.png" alt="Logo Saint-Bernard-de-Lacolle" onerror="this.style.display='none'; this.alt='Erreur logo St-Bernard';">
+            </a>
+        </div>
+        <div class="footer-logo">
+            <a href="https://www.coupdoeil.info/actualites/bourses-de-soutien-a-la-releve-sportive-de-larena-regional-lareau-les-candidatures-acceptees-jusquau-8-septembre/" target="_blank" rel="noopener noreferrer" title="Voir l'article sur Coup d'œil">
+            <img src="./images/logo-coup-doeil.png" alt="Logo Coup d'œil"
                  onerror="this.style.display='none'; this.alt='Erreur logo';">
-        </a>
+            </a>
+        </div>
         Date de l'inscription : <span class="clickable-date" id="calendarEvent">27 octobre au 21 novembre 2025</span><br>
         Location ; <a href="https://www.google.com/maps/place/50+Rue+de+l'Aqueduc,+Napierville,+QC+J0J+1L0/@45.1925621,-73.405976,17z/data=!3m1!4b1!4m6!3m5!1s0x4cc99c4fe6125c81:0xfa62b2f92497e296!8m2!3d45.1925621!4d-73.4034011!16s%2Fg%2F1v8x1tg4?entry=ttu&g_ep=EgoyMDI1MTAyMi4wIKXMDSoASAFQAw%3D%3D" target="_blank" rel="noopener noreferrer">Aréna régionale Lareau - 50 rue de l'Aqueduc, Napierville, Québec, J0J 1L0</a><br>
         Courriel : <a href="mailto:glaplante@csrlc.ca?subject=Bourses%20sportive%20-%20autres">glaplante@csrlc.ca</a>
