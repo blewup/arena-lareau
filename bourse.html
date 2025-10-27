@@ -113,7 +113,7 @@
              text-align: center;
              backdrop-filter: blur(5px);
              white-space: nowrap;
-             border: 1px solid #f0f0f0; /* Added border */
+             border: 1px solid #f0f0f0;
          }
 
          .alt-tooltip.visible {
@@ -466,7 +466,7 @@
         
         .modal-overlay.active {
             display: flex;
-            backdrop-filter: blur(5px); /* Blur background as requested */
+            backdrop-filter: blur(5px);
         }
 
         .modal-content {
@@ -2345,7 +2345,7 @@
                 }
             }
 
-            function sendEmail(formatType = 'CSV') {
+            function sendEmail(formatType) {
                  try {
                      const recipient = "glaplante@csrlc.ca";
                      const candidatNom = document.getElementById('candidatNom').value || 'Inconnu';
@@ -2364,7 +2364,7 @@
                         body += "==================================================\n\n";
                         body += rawFormat;
                         body += "\n\n==================================================\n"
-                     } else {
+                     } else if (formatType === 'CSV') {
                         body = "==================================================\n";
                         body += `Nouvelle Candidature - Bourses de la Relève Sportive\n`;
                         body += `Soumise le: ${new Date().toLocaleString('fr-CA')}\n`;                          
