@@ -2345,7 +2345,7 @@
                 }
             }
 
-            function sendEmail(content, formatType) {
+            function sendEmail(formatType = 'CSV') {
                  try {
                      const recipient = "glaplante@csrlc.ca";
                      const candidatNom = document.getElementById('candidatNom').value || 'Inconnu';
@@ -2355,29 +2355,29 @@
                      const tableFormat = formatAsTextTable(labeledData);
                      const rawFormat = formatAsTextRaw(labeledData);
                      body = '';
-                     if (formatType === 'CSV') {
+                     if (formatType === 'TXT) {
                         body = "==================================================\n";
                         body += `Nouvelle Candidature - Bourses de la Relève Sportive\n`;
                         body += `Soumise le: ${new Date().toLocaleString('fr-CA')}\n`;
                         body += "==================================================\n";
-                        body += "          FORMAT TABLEAU (Aligné)\n";
+                        body += "          FORMAT BRUT (Simple)\n";
                         body += "==================================================\n\n";
-                        body += tableFormat;
+                        body += rawFormat;
                         body += "\n\n==================================================\n"
-                     } else if (formatType === 'TXT') {
+                     } else {
                         body = "==================================================\n";
                         body += `Nouvelle Candidature - Bourses de la Relève Sportive\n`;
-                         body += `Soumise le: ${new Date().toLocaleString('fr-CA')}\n`;                          
-                         body += "==================================================\n";
-                         body += "            FORMAT BRUT (Simple)\n";
-                         body += "==================================================\n\n";
-                         body += rawFormat;
-                         body += "\n\n==================================================\n";
+                        body += `Soumise le: ${new Date().toLocaleString('fr-CA')}\n`;                          
+                        body += "==================================================\n";
+                        body += "            FORMAT TABLEAU (Aligné)\n";
+                        body += "==================================================\n\n";
+                        body += tableFormat;
+                        body += "\n\n==================================================\n";
                      }
 
                      const encodedSubject = encodeURIComponent(subject);
                      const encodedBody = encodeURIComponent(body);
-                     const mailtoLink = `mailto:${recipient}?subject=${encodedSubject}&body=${body}`;
+                     const mailtoLink = `mailto:${recipient}?subject=${encodedSubject}&body=${encodedBody}`;
 
                     if (mailtoLink.length > 2600) {
                          console.warn("Mailto link is very long, might exceed limits.");
