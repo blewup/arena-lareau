@@ -627,38 +627,49 @@
 
         .button-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: 1fr;
             gap: 15px;
             margin-top: 30px;
+            width: 100%;
+            max-width: 100%;
         }
 
         .btn {
-            padding: 10px 5px;
+            padding: 12px 10px;
             border: none;
             border-radius: 6px;
-            font-size: 0.9rem;
+            font-size: 1.1rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s ease-in-out;
             text-align: center;
             white-space: nowrap;
+            width: 100%;
         }
 
-        .btn-download, .btn-send {
+        .btn-send {
             background-color: var(--page-bg);
             color: var(--accent-color);
             border: 2px solid var(--accent-color);
         }
 
-        .btn-download:hover, .btn-send:hover {
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            background-color: #ccc;
+            border-color: #aaa;
+            color: #666;
+        }
+
+        .btn-send:hover:not(:disabled) {
             background-color: var(--accent-color);
             color: var(--page-bg);
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
-         .btn-download:active, .btn-send:active {
-            transform: scale(0.98) translateY(0px);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+         .btn-send:active:not(:disabled) {
+             transform: scale(0.98) translateY(0px);
+             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
          }
 
         footer {
@@ -937,7 +948,7 @@
                     </div>
 
                     <div class="button-grid">
-                        <button type="button" id="btnSendGitHub" class="btn btn-send">
+                        <button type="button" id="btnSend" class="btn btn-send">
                             <i class="fas fa-paper-plane"></i> Soumettre
                         </button>
                     </div>
@@ -1318,10 +1329,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             let hasAttemptedSubmit = false;
             const form = document.getElementById('bourseSurveyForm');
-            const downloadTxtBtn = document.getElementById('btnDownloadTxt');
-            const sendTxtBtn = document.getElementById('btnSendTxt');
-            const downloadCsvBtn = document.getElementById('btnDownloadCsv');
-            const sendCsvBtn = document.getElementById('btnSendCsv');
+            const sendBtn = document.getElementById('btnSend');
             const feedbackDiv = document.getElementById('feedbackMessage');
             const candidatNomInput = document.getElementById('candidatNom');
             const parentNomInput = document.getElementById('parentNom');
@@ -1332,14 +1340,6 @@
             const parentVilleInput = document.getElementById('parentVille');
             const parentLienInput = document.getElementById('parentLien');
             const qAutresTextarea = document.getElementById('qAutres');
-
-            const sendGitHubBtn = document.getElementById('btnSendGitHub');
-        
-            const GITHUB_TOKEN = "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";
-            const GITHUB_OWNER = "blewup";
-            const GITHUB_REPO = "arena-lareau";
-            const GITHUB_FILE_PATH = "reponses.csv";
-            const GITHUB_API_URL = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_FILE_PATH}`;
             
             const EVENT_START_DATE = new Date('2025-10-27T00:00:00');
             const EVENT_END_DATE = new Date('2025-11-21T23:59:59');
@@ -2267,332 +2267,59 @@
                  return csvContent;
             }
 
-            function getFormDataWithLabelsLegacy() {
-                const formData = new FormData(form);
-                const data = {};
-                const labels = {
-                    candidatNom: "Nom du candidat",
-                    candidatVille: "Ville du candidat",
-                    candidatTel: "Téléphone du candidat",
-                    candidatDob: "Date de naissance",
-                    candidatSport: "Sport pratiqué",
-                    parentNom: "Nom du parent",
-                    parentVille: "Ville du parent",
-                    parentTel: "Téléphone du parent",
-                    parentLien: "Lien avec candidat",
-                    qSport: "DESCRIPTION DE VOTRE SPORT",
-                    qAmbitions: "VOS AMBITIONS ET OBJECTIFS",
-                    qFierte: "FIERTÉS ET RÉSULTATS",
-                    qBesoins: "VOS BESOINS",
-                    qAutres: "AUTRES COMMENTAIRES"
-                };
-                for (const key of Object.keys(labels)) {
-                    const element = form.elements[key];
-                    if (element) { data[labels[key]] = element.value || ''; }
-                }
-                return data;
-            }
-
-            function formatAsTextTable(data) {
-                let text = `Candidature - Bourses de la Relève Sportive - ${getFilenameTimestamp()}\n`;
-                text += "==================================================\n\n";
-                let maxLabelLength = 0;
-                for (const key in data) {
-                    if (key.length > maxLabelLength) {
-                        maxLabelLength = key.length;
-                    }
-                }
-                maxLabelLength += 2;
-                for (const key in data) {
-                    const labelPadded = key.padEnd(maxLabelLength, ' ');
-                    const answerLines = (data[key] || '-').split('\n');
-                    text += `${labelPadded}: ${answerLines[0]}\n`;
-                    for (let i = 1; i < answerLines.length; i++) {
-                        text += `${' '.repeat(maxLabelLength + 2)}${answerLines[i]}\n`;
-                    }
-                    text += "\n";
-                }
-                return text.replace(/\n\n$/, '\n');
-            }
-            function formatAsTextRaw(data) {
-                let text = `Candidature - Bourses de la Relève Sportive - ${getFilenameTimestamp()}\n`;
-                text += "==================================================\n\n";
-                for (const key in data) {
-                    text += `${key}:\n${data[key] || '-'}\n\n`;
-                }
-                return text.replace(/\n\n$/, '\n');
-            }
-            function getFormDataWithLabels() {
-                const data = {}; const labels = { candidatNom: "Nom du candidat", candidatVille: "Ville du candidat", candidatTel: "Téléphone du candidat", candidatDob: "Date de naissance", candidatSport: "Sport pratiqué", parentNom: "Nom du parent", parentVille: "Ville du parent", parentTel: "Téléphone du parent", parentLien: "Lien avec candidat", qSport: "DESCRIPTION DE VOTRE SPORT", qAmbitions: "VOS AMBITIONS ET OBJECTIFS", qFierte: "FIERTÉS ET RÉSULTATS", qBesoins: "VOS BESOINS", qAutres: "AUTRES COMMENTAIRES" };
-                for (const key of Object.keys(labels)) { const element = form.elements[key]; if (element) { data[labels[key]] = element.value || ''; } } return data;
-            }
-
-            function downloadFile(content, filename, mimeType) {
-                try {
-                    const blob = new Blob([content], { type: mimeType });
-                    const link = document.createElement('a');
-                    link.href = URL.createObjectURL(blob);
-                    link.download = filename;
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                    URL.revokeObjectURL(link.href);
-                    displayFeedback(`Lien de téléchargement .${filename.slice(-3).toUpperCase()} initié avec succès.`, 'success');
-                } catch (error) {
-                    console.error("Erreur de téléchargement:", error);
-                    displayFeedback("Erreur lors de la création du fichier de téléchargement.", 'error');
-                }
-            }
-
-            function sendEmail(formatType) {
-                 try {
-                     const recipient = "glaplante@csrlc.ca";
-                     const candidatNom = document.getElementById('candidatNom').value || 'Inconnu';
-                     const timestampSubj = getFormattedTimestamp(false);
-                     const subject = `Bourses sportive - ${candidatNom} - ${timestampSubj}`;
-                     const labeledData = getFormDataWithLabels();
-                     const tableFormat = formatAsTextTable(labeledData);
-                     const rawFormat = formatAsTextRaw(labeledData);
-                     body = '';
-                     if (formatType === 'TXT') {
-                        body = "==================================================\n";
-                        body += `Nouvelle Candidature - Bourses de la Relève Sportive\n`;
-                        body += `Soumise le: ${new Date().toLocaleString('fr-CA')}\n`;
-                        body += "==================================================\n";
-                        body += "          FORMAT BRUT (Simple)\n";
-                        body += "==================================================\n\n";
-                        body += rawFormat;
-                        body += "\n\n==================================================\n"
-                     } else if (formatType === 'CSV') {
-                        body = "==================================================\n";
-                        body += `Nouvelle Candidature - Bourses de la Relève Sportive\n`;
-                        body += `Soumise le: ${new Date().toLocaleString('fr-CA')}\n`;                          
-                        body += "==================================================\n";
-                        body += "            FORMAT TABLEAU (Aligné)\n";
-                        body += "==================================================\n\n";
-                        body += tableFormat;
-                        body += "\n\n==================================================\n";
-                     }
-
-                     const encodedSubject = encodeURIComponent(subject);
-                     const encodedBody = encodeURIComponent(body);
-                     const mailtoLink = `mailto:${recipient}?subject=${encodedSubject}&body=${encodedBody}`;
-
-                    if (mailtoLink.length > 2600) {
-                         console.warn("Mailto link is very long, might exceed limits.");
-                         displayFeedback(`Les données (${formatType}) sont trop longues pour l'envoi par courriel direct. Veuillez utiliser l'option Télécharger.`, 'warning');
-                         return;
-                    }
-
-                     window.location.href = mailtoLink;
-                      displayFeedback(`Envoi du message .${formatType} démarré avec succès. Veuillez vérifier votre client de messagerie.`, 'info');
-
-                 } catch (error) {
-                     console.error("Erreur Mailto:", error);
-                     displayFeedback("Impossible d'ouvrir le client de messagerie.", 'error');
-                 }
-            }
-
-            function b64EncodeUnicode(str) {
-                return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g,
-                    function toSolidBytes(match, p1) {
-                        return String.fromCharCode('0x' + p1);
-                }));
-            }
-            
-            function b64DecodeUnicode(str) {
-                return decodeURIComponent(atob(str).split('').map(function(c) {
-                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-                }).join(''));
-            }
-
-            async function sendDataToGitHub() {
-                console.log("sendDataToGitHub: Démarrage"); // DEBUG
-
+            function sendCsvViaEmail() {
+                console.log("sendCsvViaEmail: Démarrage");
                 if (!validateForm(true)) {
-                    console.log("sendDataToGitHub: Validation échouée."); // DEBUG
+                    console.log("sendCsvViaEmail: Validation échouée.");
                     return;
                 }
-                console.log("sendDataToGitHub: Validation réussie."); // DEBUG
+                console.log("sendCsvViaEmail: Validation réussie.");
 
-                if (loadingOverlay) loadingOverlay.classList.add('active');
-                if (sendGitHubBtn) sendGitHubBtn.disabled = true;
-
-                const newCsvLine = formatDataRowForCsv();
-                const candidatName = candidatNomInput ? candidatNomInput.value : 'Inconnu';
-                const commitMessage = `Ajout candidature: ${candidatName}`;
-                console.log("sendDataToGitHub: Nouvelle ligne CSV:", newCsvLine); // DEBUG
-                console.log("sendDataToGitHub: Message de commit:", commitMessage); // DEBUG
-
-                let getResponse; // Declare outside try block for logging
-                let updateResponse; // Declare outside try block for logging
+                if(sendBtn) sendBtn.disabled = true;
 
                 try {
-                    console.log("sendDataToGitHub: Tentative de GET:", GITHUB_API_URL); // DEBUG
-                    // 1. Get current file content and SHA
-                    getResponse = await fetch(GITHUB_API_URL, {
-                        method: 'GET',
-                        headers: {
-                            'Authorization': `token ${GITHUB_TOKEN}`,
-                            'Accept': 'application/vnd.github.v3+json'
-                        },
-                        cache: 'no-cache' // Prevent caching issues
-                    });
-                    console.log("sendDataToGitHub: Réponse GET reçue, statut:", getResponse.status); // DEBUG
+                    const csvDataRow = formatDataRowForCsv();
+                    const candidatName = candidatNomInput ? candidatNomInput.value : 'Inconnu';
+                    const timestampSubj = getFormattedTimestamp(false);
+                    const recipient = "glaplante@csrlc.ca";
+                    const subject = `Nouvelle Candidature Bourse Sportive - ${candidatName} - ${timestampSubj}`;
+                    const body = csvDataRow;
 
-                    let currentContentDecoded = '';
-                    let currentSha = null;
-                    let needsHeader = false;
-                    let responseBodyText = ''; // To store response text for logging
+                    const encodedSubject = encodeURIComponent(subject);
+                    const encodedBody = encodeURIComponent(body);
+                    const mailtoLink = `mailto:${recipient}?subject=${encodedSubject}&body=${encodedBody}`;
 
-                    if (getResponse.status === 404) {
-                        console.log("sendDataToGitHub: Fichier non trouvé (404), création nécessaire.");
-                        needsHeader = true;
-                    } else if (getResponse.ok) {
-                        const getData = await getResponse.json();
-                        console.log("sendDataToGitHub: Données GET:", getData); // DEBUG
-                        currentSha = getData.sha;
-                        if (getData.content) {
-                            try {
-                                currentContentDecoded = b64DecodeUnicode(getData.content);
-                                console.log("sendDataToGitHub: Contenu actuel décodé:", currentContentDecoded.substring(0, 100) + "..."); // DEBUG
-                            } catch (e) {
-                                console.error("sendDataToGitHub: Erreur décodage Base64:", e);
-                                throw new Error("Erreur lors du décodage du contenu du fichier existant.");
-                            }
-                        }
-                        // Check if file is empty OR only contains whitespace OR doesn't contain a newline (likely header only or malformed)
-                        if (!currentContentDecoded || currentContentDecoded.trim() === '' || !currentContentDecoded.includes('\n')) {
-                            needsHeader = true; console.log("sendDataToGitHub: Fichier vide ou sans saut de ligne, ajout de l'en-tête."); currentContentDecoded = '';
-                        }
-                    } else {
-                        // Handle other non-404 errors during GET
-                        responseBodyText = await getResponse.text();
-                        console.error("sendDataToGitHub: Erreur API GET:", getResponse.status, responseBodyText);
-                        throw new Error(`Erreur GitHub API (GET ${getResponse.status}): ${responseBodyText}`);
+                    console.log("sendCsvViaEmail: Mailto link length:", mailtoLink.length);
+
+                    if (mailtoLink.length > 2000) {
+                        console.warn("sendCsvViaEmail: Mailto link is very long, might exceed limits.");
+                        displayFeedback(`Les données sont trop longues (${mailtoLink.length} caractères) pour l'envoi direct par courriel. Veuillez contacter l'administrateur.`, 'warning', 8000);
+                        if(sendBtn) sendBtn.disabled = false;
+                        return;
                     }
 
+                    window.location.href = mailtoLink;
+                    displayFeedback(`Ouverture de votre client de messagerie pour envoyer les données...`, 'info', 5000);
 
-                    // Prepare new content
-                    let newContent = currentContentDecoded;
-                    if (needsHeader) {
-                        const columnOrderLabels = [ { label: "Timestamp" }, { label: "Nom du candidat" }, { label: "Ville du candidat" }, { label: "Téléphone du candidat" }, { label: "Date de naissance" }, { label: "Sport pratiqué" }, { label: "Nom du parent" }, { label: "Ville du parent" }, { label: "Téléphone du parent" }, { label: "Lien avec candidat" }, { label: "DESCRIPTION DE VOTRE SPORT" }, { label: "VOS AMBITIONS ET OBJECTIFS" }, { label: "FIERTÉS ET RÉSULTATS" }, { label: "VOS BESOINS" }, { label: "AUTRES COMMENTAIRES" } ];
-                        const headers = columnOrderLabels.map(col => escapeCsvValue(col.label));
-                        const headerLine = headers.join(',');
-                        console.log("sendDataToGitHub: Ajout de l'en-tête:", headerLine);
-                        newContent += headerLine + '\n';
-                    }
-                    if (newContent.length > 0 && !newContent.endsWith('\n')) {
-                        console.log("sendDataToGitHub: Ajout d'un saut de ligne manquant à la fin du contenu existant.");
-                        newContent += '\n';
-                    }
-                    newContent += newCsvLine;
-                    console.log("sendDataToGitHub: Nouveau contenu avant encodage:", newContent.substring(0, 200) + "..."); // DEBUG
+                    setTimeout(() => {
+                         if(sendBtn) sendBtn.disabled = false;
+                    }, 1500);
 
-                    let newContentEncoded;
-                     try {
-                        newContentEncoded = b64EncodeUnicode(newContent);
-                        console.log("sendDataToGitHub: Nouveau contenu encodé (début):", newContentEncoded.substring(0, 50) + "..."); // DEBUG
-                     } catch (e) {
-                        console.error("sendDataToGitHub: Erreur encodage Base64:", e);
-                        throw new Error("Erreur lors de l'encodage du nouveau contenu.");
-                     }
-
-
-                    // 2. Update the file
-                    const updatePayload = {
-                        message: commitMessage,
-                        content: newContentEncoded,
-                        sha: currentSha // Include SHA if file existed, null if creating
-                    };
-                    console.log("sendDataToGitHub: Payload PUT:", { message: updatePayload.message, sha: updatePayload.sha, content_length: updatePayload.content.length }); // DEBUG
-
-                    console.log("sendDataToGitHub: Tentative de PUT:", GITHUB_API_URL); // DEBUG
-                    updateResponse = await fetch(GITHUB_API_URL, {
-                        method: 'PUT',
-                        headers: {
-                            'Authorization': `token ${GITHUB_TOKEN}`,
-                            'Accept': 'application/vnd.github.v3+json',
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(updatePayload)
-                    });
-                    console.log("sendDataToGitHub: Réponse PUT reçue, statut:", updateResponse.status); // DEBUG
-
-                    if (!updateResponse.ok) {
-                        responseBodyText = await updateResponse.text();
-                        console.error("sendDataToGitHub: Erreur API PUT:", updateResponse.status, responseBodyText);
-                        // Check for specific common errors
-                        if (updateResponse.status === 401) {
-                            throw new Error(`Erreur GitHub API (PUT 401 Unauthorized): Jeton invalide ou expiré.`);
-                        } else if (updateResponse.status === 403) {
-                             throw new Error(`Erreur GitHub API (PUT 403 Forbidden): Permissions manquantes pour le jeton.`);
-                        } else if (updateResponse.status === 409) {
-                             throw new Error(`Erreur GitHub API (PUT 409 Conflict): Conflit de version (SHA incorrect), veuillez réessayer.`);
-                        } else {
-                            throw new Error(`Erreur GitHub API (PUT ${updateResponse.status}): ${responseBodyText}`);
-                        }
-                    }
-
-                    // Success
-                    const updateData = await updateResponse.json();
-                    console.log('sendDataToGitHub: Fichier mis à jour avec succès sur GitHub:', updateData); // DEBUG
-                    displayFeedback('Candidature envoyée avec succès vers GitHub!', 'success');
-                    form.reset();
-                    validateForm(false);
-
-                    sendNotificationEmail(candidatName);
 
                 } catch (error) {
-                    console.error("sendDataToGitHub: Erreur dans le bloc try/catch:", error); // DEBUG
-                    // Affiche l'erreur complète dans la console pour un diagnostic détaillé
-                    console.error("Détails de l'erreur:", error);
-                    // Affiche un message plus simple à l'utilisateur
-                    displayFeedback(`Erreur lors de l'envoi: ${error.message || 'Erreur inconnue'}`, 'error', 10000);
-                } finally {
-                    console.log("sendDataToGitHub: Exécution du bloc finally."); // DEBUG
-                    if (loadingOverlay) loadingOverlay.classList.remove('active');
-                    if (sendGitHubBtn) sendGitHubBtn.disabled = false;
+                    console.error("Erreur lors de la création du lien mailto:", error);
+                    displayFeedback("Erreur lors de la préparation de l'e-mail.", 'error');
+                    if(sendBtn) sendBtn.disabled = false; // Re-enable on error
                 }
             }
-        
-            downloadTxtBtn.addEventListener('click', () => {
-                if (!validateForm(true)) return;
-                const data = getFormDataWithLabelsLegacy();
-                const txtContent = formatAsTextTable(data);
-                const timestampFilenamePart = getFilenameTimestamp();
-                const candidatNom = document.getElementById('candidatNom').value || 'Candidat';
-                const filenameBase = `${candidatNom}-${timestampFilenamePart}`;
-                downloadFile(txtContent, `${filenameBase}.txt`, 'text/plain;charset=utf-8');
-            });
 
-             sendTxtBtn.addEventListener('click', () => {
-                 if (!validateForm(true)) return;
-                 sendEmail('TXT');
-             });
-
-            downloadCsvBtn.addEventListener('click', () => {
-                if (!validateForm(true)) return;
-                const csvContent = formatDataForSpreadsheet();
-                const timestampFilenamePart = getFilenameTimestamp();
-                const candidatNom = document.getElementById('candidatNom').value || 'Candidat';
-                const filenameBase = `${candidatNom}-${timestampFilenamePart}`;
-                downloadFile(csvContent, `${filenameBase}.csv`, 'text/csv;charset=utf-f-8');
-            });
-
-            sendCsvBtn.addEventListener('click', () => {
-                if (!validateForm(true)) return;
-                sendEmail('CSV');
-            });
-
-             // --- Button Event Listeners ---
-             if (sendGitHubBtn) {
-                 sendGitHubBtn.addEventListener('click', () => {
+             if (sendBtn) {
+                 sendBtn.addEventListener('click', () => {
                      console.log("Bouton 'Soumettre' cliqué."); // DEBUG
-                     sendDataToGitHub();
+                     sendCsvViaEmail();
                  });
              } else {
-                 console.error("Le bouton 'Soumettre' (btnSendGitHub) est introuvable!");
+                 console.error("Le bouton 'Soumettre' (btnSend) est introuvable!");
              }
             
             validateForm(false);
