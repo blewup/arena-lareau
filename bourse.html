@@ -2407,66 +2407,108 @@
             }
 
             async function sendDataToGitHub() {
-                if (!validateForm(true)) return;
+                console.log("sendDataToGitHub: Démarrage"); // DEBUG
+
+                if (!validateForm(true)) {
+                    console.log("sendDataToGitHub: Validation échouée."); // DEBUG
+                    return;
+                }
+                console.log("sendDataToGitHub: Validation réussie."); // DEBUG
 
                 if (loadingOverlay) loadingOverlay.classList.add('active');
                 if (sendGitHubBtn) sendGitHubBtn.disabled = true;
 
                 const newCsvLine = formatDataRowForCsv();
-                const commitMessage = `Ajout candidature: ${candidatNomInput ? candidatNomInput.value : 'Inconnu'}`;
+                const candidatName = candidatNomInput ? candidatNomInput.value : 'Inconnu';
+                const commitMessage = `Ajout candidature: ${candidatName}`;
+                console.log("sendDataToGitHub: Nouvelle ligne CSV:", newCsvLine); // DEBUG
+                console.log("sendDataToGitHub: Message de commit:", commitMessage); // DEBUG
+
+                let getResponse; // Declare outside try block for logging
+                let updateResponse; // Declare outside try block for logging
 
                 try {
-                    const getResponse = await fetch(GITHUB_API_URL, {
+                    console.log("sendDataToGitHub: Tentative de GET:", GITHUB_API_URL); // DEBUG
+                    // 1. Get current file content and SHA
+                    getResponse = await fetch(GITHUB_API_URL, {
                         method: 'GET',
                         headers: {
                             'Authorization': `token ${GITHUB_TOKEN}`,
                             'Accept': 'application/vnd.github.v3+json'
-                        }
+                        },
+                        cache: 'no-cache' // Prevent caching issues
                     });
-
-                    if (!getResponse.ok && getResponse.status !== 404) {
-                        throw new Error(`Erreur GitHub API (GET): ${getResponse.status} ${await getResponse.text()}`);
-                    }
+                    console.log("sendDataToGitHub: Réponse GET reçue, statut:", getResponse.status); // DEBUG
 
                     let currentContentDecoded = '';
                     let currentSha = null;
                     let needsHeader = false;
+                    let responseBodyText = ''; // To store response text for logging
 
                     if (getResponse.status === 404) {
-                        console.log("Le fichier n'existe pas, création avec en-tête.");
+                        console.log("sendDataToGitHub: Fichier non trouvé (404), création nécessaire.");
                         needsHeader = true;
-                    } else {
+                    } else if (getResponse.ok) {
                         const getData = await getResponse.json();
+                        console.log("sendDataToGitHub: Données GET:", getData); // DEBUG
                         currentSha = getData.sha;
                         if (getData.content) {
-                            currentContentDecoded = b64DecodeUnicode(getData.content);
+                            try {
+                                currentContentDecoded = b64DecodeUnicode(getData.content);
+                                console.log("sendDataToGitHub: Contenu actuel décodé:", currentContentDecoded.substring(0, 100) + "..."); // DEBUG
+                            } catch (e) {
+                                console.error("sendDataToGitHub: Erreur décodage Base64:", e);
+                                throw new Error("Erreur lors du décodage du contenu du fichier existant.");
+                            }
                         }
-                        if (!currentContentDecoded || currentContentDecoded.trim() === '') {
-                             needsHeader = true;
-                             console.log("Le fichier existe mais est vide, ajout de l'en-tête.");
+                        // Check if file is empty OR only contains whitespace OR doesn't contain a newline (likely header only or malformed)
+                        if (!currentContentDecoded || currentContentDecoded.trim() === '' || !currentContentDecoded.includes('\n')) {
+                            needsHeader = true; console.log("sendDataToGitHub: Fichier vide ou sans saut de ligne, ajout de l'en-tête."); currentContentDecoded = '';
                         }
+                    } else {
+                        // Handle other non-404 errors during GET
+                        responseBodyText = await getResponse.text();
+                        console.error("sendDataToGitHub: Erreur API GET:", getResponse.status, responseBodyText);
+                        throw new Error(`Erreur GitHub API (GET ${getResponse.status}): ${responseBodyText}`);
                     }
 
+
+                    // Prepare new content
                     let newContent = currentContentDecoded;
                     if (needsHeader) {
                         const columnOrderLabels = [ { label: "Timestamp" }, { label: "Nom du candidat" }, { label: "Ville du candidat" }, { label: "Téléphone du candidat" }, { label: "Date de naissance" }, { label: "Sport pratiqué" }, { label: "Nom du parent" }, { label: "Ville du parent" }, { label: "Téléphone du parent" }, { label: "Lien avec candidat" }, { label: "DESCRIPTION DE VOTRE SPORT" }, { label: "VOS AMBITIONS ET OBJECTIFS" }, { label: "FIERTÉS ET RÉSULTATS" }, { label: "VOS BESOINS" }, { label: "AUTRES COMMENTAIRES" } ];
                         const headers = columnOrderLabels.map(col => escapeCsvValue(col.label));
-                        newContent += headers.join(',') + '\n';
+                        const headerLine = headers.join(',');
+                        console.log("sendDataToGitHub: Ajout de l'en-tête:", headerLine);
+                        newContent += headerLine + '\n';
                     }
-                    if (!newContent.endsWith('\n') && newContent.length > 0) {
+                    if (newContent.length > 0 && !newContent.endsWith('\n')) {
+                        console.log("sendDataToGitHub: Ajout d'un saut de ligne manquant à la fin du contenu existant.");
                         newContent += '\n';
                     }
                     newContent += newCsvLine;
+                    console.log("sendDataToGitHub: Nouveau contenu avant encodage:", newContent.substring(0, 200) + "..."); // DEBUG
 
-                    const newContentEncoded = b64EncodeUnicode(newContent);
+                    let newContentEncoded;
+                     try {
+                        newContentEncoded = b64EncodeUnicode(newContent);
+                        console.log("sendDataToGitHub: Nouveau contenu encodé (début):", newContentEncoded.substring(0, 50) + "..."); // DEBUG
+                     } catch (e) {
+                        console.error("sendDataToGitHub: Erreur encodage Base64:", e);
+                        throw new Error("Erreur lors de l'encodage du nouveau contenu.");
+                     }
 
+
+                    // 2. Update the file
                     const updatePayload = {
                         message: commitMessage,
                         content: newContentEncoded,
-                        sha: currentSha
+                        sha: currentSha // Include SHA if file existed, null if creating
                     };
+                    console.log("sendDataToGitHub: Payload PUT:", { message: updatePayload.message, sha: updatePayload.sha, content_length: updatePayload.content.length }); // DEBUG
 
-                    const updateResponse = await fetch(GITHUB_API_URL, {
+                    console.log("sendDataToGitHub: Tentative de PUT:", GITHUB_API_URL); // DEBUG
+                    updateResponse = await fetch(GITHUB_API_URL, {
                         method: 'PUT',
                         headers: {
                             'Authorization': `token ${GITHUB_TOKEN}`,
@@ -2475,21 +2517,42 @@
                         },
                         body: JSON.stringify(updatePayload)
                     });
+                    console.log("sendDataToGitHub: Réponse PUT reçue, statut:", updateResponse.status); // DEBUG
 
                     if (!updateResponse.ok) {
-                        throw new Error(`Erreur GitHub API (PUT): ${updateResponse.status} ${await updateResponse.text()}`);
+                        responseBodyText = await updateResponse.text();
+                        console.error("sendDataToGitHub: Erreur API PUT:", updateResponse.status, responseBodyText);
+                        // Check for specific common errors
+                        if (updateResponse.status === 401) {
+                            throw new Error(`Erreur GitHub API (PUT 401 Unauthorized): Jeton invalide ou expiré.`);
+                        } else if (updateResponse.status === 403) {
+                             throw new Error(`Erreur GitHub API (PUT 403 Forbidden): Permissions manquantes pour le jeton.`);
+                        } else if (updateResponse.status === 409) {
+                             throw new Error(`Erreur GitHub API (PUT 409 Conflict): Conflit de version (SHA incorrect), veuillez réessayer.`);
+                        } else {
+                            throw new Error(`Erreur GitHub API (PUT ${updateResponse.status}): ${responseBodyText}`);
+                        }
                     }
 
+                    // Success
                     const updateData = await updateResponse.json();
-                    console.log('Fichier mis à jour sur GitHub:', updateData);
+                    console.log('sendDataToGitHub: Fichier mis à jour avec succès sur GitHub:', updateData); // DEBUG
                     displayFeedback('Candidature envoyée avec succès vers GitHub!', 'success');
+                    form.reset();
+                    validateForm(false);
+
+                    sendNotificationEmail(candidatName);
 
                 } catch (error) {
-                    console.error("Erreur lors de l'envoi vers GitHub:", error);
-                    displayFeedback(`Erreur lors de l'envoi: ${error.message}`, 'error', 10000000);
+                    console.error("sendDataToGitHub: Erreur dans le bloc try/catch:", error); // DEBUG
+                    // Affiche l'erreur complète dans la console pour un diagnostic détaillé
+                    console.error("Détails de l'erreur:", error);
+                    // Affiche un message plus simple à l'utilisateur
+                    displayFeedback(`Erreur lors de l'envoi: ${error.message || 'Erreur inconnue'}`, 'error', 10000);
                 } finally {
-                     if (loadingOverlay) loadingOverlay.classList.remove('active');
-                     if (sendGitHubBtn) sendGitHubBtn.disabled = false;
+                    console.log("sendDataToGitHub: Exécution du bloc finally."); // DEBUG
+                    if (loadingOverlay) loadingOverlay.classList.remove('active');
+                    if (sendGitHubBtn) sendGitHubBtn.disabled = false;
                 }
             }
         
@@ -2522,13 +2585,15 @@
                 sendEmail('CSV');
             });
 
-            if (sendGitHubBtn) {
-                sendGitHubBtn.addEventListener('click', () => {
-                    sendDataToGitHub();
-                });
-            } else {
-                console.error("Le bouton 'Envoyer vers GitHub' est introuvable!");
-            }
+             // --- Button Event Listeners ---
+             if (sendGitHubBtn) {
+                 sendGitHubBtn.addEventListener('click', () => {
+                     console.log("Bouton 'Soumettre' cliqué."); // DEBUG
+                     sendDataToGitHub();
+                 });
+             } else {
+                 console.error("Le bouton 'Soumettre' (btnSendGitHub) est introuvable!");
+             }
             
             validateForm(false);
 
