@@ -2364,7 +2364,7 @@
                 
                 if (includeMs) {
                     const ms = String(now.getMilliseconds()).padStart(3, '0').charAt(0);
-                    return `"${dayOfWeek}\n${dd}/${mm}/${yyyy}\n${HH}:${MM}:${SS}.${ms}"`;
+                    return `"${dayOfWeek}-${dd}/${mm}/${yyyy}-${HH}:${MM}:${SS}.${ms}"`;
                 }
                 return `${dd}/${mm}/${yyyy} ${HH}:${MM}:${SS}`;
             }
@@ -2382,7 +2382,7 @@
             function escapeCsvValue(value) {
                  if (value === null || value === undefined) return '';
                  let str = String(value);
-                 if (str.includes('|') || str.includes('\n') || str.includes('"')) {
+                 if (str.includes('') || str.includes('\n') || str.includes('"')) {
                      str = str.replace(/"/g, '""');
                      return `"${str}"`;
                  }
@@ -2416,8 +2416,8 @@
                   }
 
                   const dataRow = [timestamp].concat(rowData);
-                  console.log("formatDataRowForCsv: Ligne CSV générée (début):", dataRow.join(';').substring(0, 100));
-                  return dataRow.join(';');
+                  console.log("formatDataRowForCsv: Ligne CSV générée (début):", dataRow.join('\t').substring(0, 100));
+                  return dataRow.join('\t');
              }
              function formatQuestionsAndAnswers() {
                  let qaString = "";
