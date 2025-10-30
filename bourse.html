@@ -2382,7 +2382,7 @@
             function escapeCsvValue(value) {
                  if (value === null || value === undefined) return '';
                  let str = String(value);
-                 if (str.includes(',') || str.includes('\n') || str.includes('"')) {
+                 if (str.includes(';') || str.includes('\n') || str.includes('"')) {
                      str = str.replace(/"/g, '""');
                      return `"${str}"`;
                  }
