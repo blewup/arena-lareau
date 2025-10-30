@@ -2376,7 +2376,7 @@
                  const yyyy = now.getFullYear();
                  const hh = String(now.getHours()).padStart(2, '0');
                  const min = String(now.getMinutes()).padStart(2, '0');
-                 return `${dd}-${mm}-${yyyy}_${hh}h${min}`;
+                 return `${dd}-${mm}-${yyyy} ${hh}h${min}`;
              }
 
             function escapeCsvValue(value) {
@@ -2416,8 +2416,8 @@
                   }
 
                   const dataRow = [timestamp].concat(rowData);
-                  console.log("formatDataRowForCsv: Ligne CSV générée (début):", dataRow.join('\t').substring(0, 100));
-                  return dataRow.join('\t');
+                  console.log("formatDataRowForCsv: Ligne CSV générée (début):", dataRow.join(';').substring(0, 100));
+                  return dataRow.join(';');
              }
              function formatQuestionsAndAnswers() {
                  let qaString = "";
