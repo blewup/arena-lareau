@@ -2391,7 +2391,7 @@
              function formatDataRowForCsv() {
                   console.log("formatDataRowForCsv: Début");
                   const formElements = form.elements;
-                  const columnOrder = [ { id: 'candidatNom' }; { id: 'candidatVille' }; { id: 'candidatTel' }; { id: 'candidatDob' }; { id: 'candidatSport' }; { id: 'parentNom' }; { id: 'parentVille' }; { id: 'parentTel' }; { id: 'parentLien' }; { id: 'qSport' }; { id: 'qAmbitions' }; { id: 'qFierte' }; { id: 'qBesoins' }; { id: 'qAutres' } ];
+                  const columnOrder = [ { id: 'candidatNom' }, { id: 'candidatVille' }, { id: 'candidatTel' }, { id: 'candidatDob' }, { id: 'candidatSport' }, { id: 'parentNom' }, { id: 'parentVille' }, { id: 'parentTel' }, { id: 'parentLien' }, { id: 'qSport' }, { id: 'qAmbitions' }, { id: 'qFierte' }, { id: 'qBesoins' }, { id: 'qAutres' } ];
                   let rowData;
                   try {
                       rowData = columnOrder.map(col => {
