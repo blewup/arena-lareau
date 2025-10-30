@@ -2416,8 +2416,8 @@
                   }
 
                   const dataRow = [timestamp].concat(rowData);
-                  console.log("formatDataRowForCsv: Ligne CSV générée (début):", dataRow.join(',').substring(0, 100));
-                  return dataRow.join(',');
+                  console.log("formatDataRowForCsv: Ligne CSV générée (début):", dataRow.join(';').substring(0, 100));
+                  return dataRow.join(';');
              }
              function formatQuestionsAndAnswers() {
                  let qaString = "";
